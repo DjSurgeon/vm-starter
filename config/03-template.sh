@@ -15,7 +15,7 @@ export TEMPLATE_HOSTNAME="devpod-base"      # Hostname inside the VM
 # -----------------------------------------------------------------------------
 export TEMPLATE_RAM_MB="4096"               # RAM in MB (4 GB)
 export TEMPLATE_CPU="2"                     # Number of virtual CPUs
-export TEMPLATE_DISK_MB="51200"              # Disk size in MB (50 GB)
+export TEMPLATE_DISK_MB="20480"             # Disk size in MB (20 GB)
 
 # -----------------------------------------------------------------------------
 # Template‑specific directory and disk image path
