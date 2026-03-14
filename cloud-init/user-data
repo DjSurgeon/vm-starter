@@ -15,7 +15,7 @@ autoinstall:
   
   identity:
     hostname: devpod-base
-    password: "$6$aLz0.e0P3LNUkpKn$kWCOKbOF9.uYwhc6mnayyslRiVbk/YtNfSPDAOs7mIddoMdMKwXI3uj/Q.mFSb6AFZ.UqmA1bCTUIDUrrrm6m."
+    password: "$6$iA6.LD4nTq3OBLkG$Nm/o4BF2zy3eKR3uwlhOj31JCgB9In.CPp.WM7t9pBgQER93FrDFrWCLamDulE7N/X.q9cR0kFGQKfhCcYbdC1"
     username: dev
   
   ssh:
@@ -46,5 +46,11 @@ autoinstall:
     - curtin in-target -- sh -c "chmod 600 /swapfile || true"
     - curtin in-target -- sh -c "mkswap /swapfile || true"
     - curtin in-target -- sh -c "grep -q swapfile /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab || true"
+
+# Pasamos configuración nativa de cloud-init para el PRIMER ARRANQUE
+  user-data:
+    runcmd:
+      # Esto se ejecuta en el primer arranque, garantizando que el grupo docker no se borre
+      - usermod -aG docker dev
 
   shutdown: poweroff
