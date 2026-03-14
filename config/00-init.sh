@@ -21,6 +21,13 @@ SCRIPTS_DIR="${BASE_DIR}/scripts"				# Post‑install scripts
 CLOUD_INIT_DIR="${BASE_DIR}/cloud-init"			# Generated cloud‑init files
 
 # -----------------------------------------------------------------------------
+# Ubuntu ISO Source (Noble Numbat 24.04.1 LTS)
+# -----------------------------------------------------------------------------
+export UBUNTU_ISO_URL="https://releases.ubuntu.com/24.04.1/ubuntu-24.04.1-live-server-amd64.iso"
+export UBUNTU_ISO_FILENAME="ubuntu-24.04-server.iso"
+export UBUNTU_ISO_PATH="${ISO_DIR}/${UBUNTU_ISO_FILENAME}"
+
+# -----------------------------------------------------------------------------
 # Ensure every directory exists (create if missing).
 # -----------------------------------------------------------------------------
 mkdir -p	"$DISK_IMAGES_DIR" \

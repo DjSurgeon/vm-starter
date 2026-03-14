@@ -1,0 +1,46 @@
+# =============================================================================
+# DevPod .gitignore
+# =============================================================================
+
+# 1. Archivos pesados de Máquinas Virtuales e ISOs
+/disk_images/
+/iso/
+*.iso
+*.vdi
+*.vmdk
+*.vbox
+*.vbox-prev
+
+# 2. Archivos autogenerados por los scripts (Build artifacts)
+/cloud-init/user-data
+/cloud-init/meta-data
+/tmp/
+*.tar
+*.tar.gz
+
+# 3. Logs y salidas de error
+*.log
+crash.log
+/logs/
+
+# 4. Claves SSH o secretos (por si alguna vez generas alguna localmente)
+*.pem
+*.key
+id_rsa
+id_ed25519
+id_rsa.pub
+id_ed25519.pub
+
+# 5. Archivos del Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 6. Carpetas de Entornos de Desarrollo (Opcional, pero recomendado)
+.vscode/
+.idea/
+*.swp

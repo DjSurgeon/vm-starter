@@ -35,7 +35,7 @@ export PACKAGES_DOCKER="
 	docker-ce					# Docker Community Edition engine
 	docker-ce-cli				# Docker command-line interface
 	containerd.io				# Container runtime (used by Docker)
-	docker-compose-plugin		# Docker Compose V2 plugin (runs as `docker compose`)
+	docker-compose-plugin		# Docker Compose V2 plugin (runs as docker compose)
 "
 
 # -----------------------------------------------------------------------------

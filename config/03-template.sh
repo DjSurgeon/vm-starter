@@ -11,6 +11,13 @@ export TEMPLATE_NAME="devpod-base"          # Name of the base VM in VirtualBox
 export TEMPLATE_HOSTNAME="devpod-base"      # Hostname inside the VM
 
 # -----------------------------------------------------------------------------
+# VirtualBox VM Metadata and Controllers
+# -----------------------------------------------------------------------------
+export TEMPLATE_OSTYPE="Ubuntu_64"          # VirtualBox OS type ID
+export CONTROLLER_SATA="SATA Controller"    # Name for the SATA controller
+export CONTROLLER_IDE="IDE Controller"      # Name for the IDE controller (for ISOs)
+
+# -----------------------------------------------------------------------------
 # Hardware resources allocated to the template
 # -----------------------------------------------------------------------------
 export TEMPLATE_RAM_MB="4096"               # RAM in MB (4 GB)

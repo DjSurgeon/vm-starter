@@ -29,7 +29,7 @@ export WEB_CLONE_DISK_MB="81920"     # Disk size in MB (80 GB) – enough for no
 # -----------------------------------------------------------------------------
 export INCEPTION_CLONE_RAM_MB="4096"    # RAM in MB (4 GB) – sufficient for Inception services
 export INCEPTION_CLONE_CPU="2"           # Number of virtual CPUs
-export INCEPTION_CLONE_DISK_MB="20480"   # Disk size in MB (20 GB) – for Docker volumes and images
+export INCEPTION_CLONE_DISK_MB="30720"   # Disk size in MB (30 GB) – for Docker volumes and images
 
 # -----------------------------------------------------------------------------
 # NAMING PREFIXES
