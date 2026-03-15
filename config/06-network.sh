@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 # SSH port mapping (host → VM)
 # -----------------------------------------------------------------------------
-export SSH_PORT="4222"				# Port on the host that forwards to VM's SSH
+export SSH_PORT="2222"				# Port on the host that forwards to VM's SSH
 export SSH_VM_PORT="22"				# Standard SSH port inside the VM
 
 # -----------------------------------------------------------------------------
@@ -19,8 +19,8 @@ export HTTPS_HOST_PORT="8443"		# Host port for HTTPS (maps to VM port 443)
 # -----------------------------------------------------------------------------
 # Range of host ports for multiple clones (each gets a unique SSH port)
 # -----------------------------------------------------------------------------
-export SSH_PORT_RANGE_START="4222"	# First port in the range (inclusive)
-export SSH_PORT_RANGE_END="4299"	# Last port in the range (inclusive)
+export SSH_PORT_RANGE_START="2222"	# First port in the range (inclusive)
+export SSH_PORT_RANGE_END="2299"	# Last port in the range (inclusive)
 
 # -----------------------------------------------------------------------------
 # SSH daemon hardening (applied inside the VM)

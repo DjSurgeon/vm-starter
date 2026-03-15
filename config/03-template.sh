@@ -22,7 +22,7 @@ export CONTROLLER_IDE="IDE Controller"      # Name for the IDE controller (for I
 # -----------------------------------------------------------------------------
 export TEMPLATE_RAM_MB="4096"               # RAM in MB (4 GB)
 export TEMPLATE_CPU="2"                     # Number of virtual CPUs
-export TEMPLATE_DISK_MB="20480"             # Disk size in MB (20 GB)
+export TEMPLATE_DISK_MB="30720"             # Disk size in MB (30 GB)
 
 # -----------------------------------------------------------------------------
 # Template‑specific directory and disk image path

@@ -148,12 +148,19 @@ deps:
 	@printf "$(C_GREEN)✓ Dependencies installed.$(C_RESET)\n"
 
 clean:
-	@printf "$(C_YELLOW)▶ Removing ISOs and seed files...$(C_RESET)\n"
-	@if [ -n "$(ISO_DIR)" ] && [ -d "$(ISO_DIR)" ]; then \
-		rm -f "$(ISO_DIR)"/*.iso; \
-	fi
-	@rm -f /tmp/seed-*.iso
+	@printf "$(C_YELLOW)▶ Removing temporary seed files and configs...$(C_RESET)\n"
+	@rm -f /tmp/seed-*.iso iso/seed-*.iso
+	@rm -rf cloud-init/user-data cloud-init/meta-data
 	@printf "$(C_GREEN)✓ Clean done.$(C_RESET)\n"
+
+vclean: clean
+	@printf "$(C_YELLOW)▶ Removing DevPod VMs (keeping ISO)...$(C_RESET)\n"
+	@for vm in $$(VBoxManage list vms | awk '{print $$1}' | tr -d '"' | grep -E "^devpod-base$$|^web-|^inception-"); do \
+		printf "  Deleting $$vm...\n"; \
+		VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
+		VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
+	done; \
+	rm -rf $(DISK_IMAGES_DIR)/$(TEMPLATE_NAME) 2>/dev/null || true
 
 fclean:
 	@printf "$(C_RED)⚠ WARNING: This will delete ALL DevPod VMs and files.$(C_RESET)\n"
@@ -175,5 +182,5 @@ fclean:
 		printf "\n$(C_YELLOW)Aborted.$(C_RESET)\n"; \
 	fi
 
-re: fclean template
+re: vclean template
 	@printf "$(C_GREEN)✓ Rebuild complete.$(C_RESET)\n"
