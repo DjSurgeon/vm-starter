@@ -45,9 +45,9 @@ help:
 	@printf "  $(C_GREEN)make re$(C_RESET)              Full rebuild (fclean + template)\n\n"
 
 template:
-	@printf "$(C_CYAN)▶ Creating base template...$(C_RESET)\n"
+	@printf "$(C_CYAN)▶ Creating base template with user: $(C_BOLD)$${USER_NAME:-$(ADMIN_USER)}$(C_RESET)\n"
 	@chmod +x template/create-template.sh
-	@./template/create-template.sh
+	@ADMIN_USER=$${USER_NAME:-$(ADMIN_USER)} ./template/create-template.sh
 
 project:
 	@chmod +x scripts/clone.sh 2>/dev/null || true

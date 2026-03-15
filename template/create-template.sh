@@ -37,6 +37,8 @@ check_command() {
 # -----------------------------------------------------------------------------
 # 3. Check dependencies & environment
 # -----------------------------------------------------------------------------
+[ -n "$1" ] && ADMIN_USER="$1"
+log "Using admin user: ${ADMIN_USER}"
 log "Checking required tools..."
 check_command VBoxManage "virtualbox"
 check_command genisoimage "genisoimage"
@@ -132,9 +134,11 @@ autoinstall:
 
 # Pasamos configuración nativa de cloud-init para el PRIMER ARRANQUE
   user-data:
+    package_upgrade: true
     runcmd:
       # Esto se ejecuta en el primer arranque, garantizando que el grupo docker no se borre
       - usermod -aG docker ${ADMIN_USER}
+      # TEMPORAL para inception - echo "127.0.0.1 ${ADMIN_USER}.42.fr" >> /etc/hosts
 
   shutdown: poweroff
 EOF

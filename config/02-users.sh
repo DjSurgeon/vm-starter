@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 # Administrative user (non‑root) for daily development work.
 # -----------------------------------------------------------------------------
-export ADMIN_USER="dev"                     # Username for the main developer account
+export ADMIN_USER="${ADMIN_USER:-dev}"                     # Username for the main developer account
 export ADMIN_FULLNAME="Developer"           # Full name (GECOS field)
 export ADMIN_PASSWORD="tempuser123"         # Initial password – CHANGE AFTER FIRST BOOT!
 

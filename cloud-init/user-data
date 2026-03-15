@@ -15,8 +15,8 @@ autoinstall:
   
   identity:
     hostname: devpod-base
-    password: "$6$iA6.LD4nTq3OBLkG$Nm/o4BF2zy3eKR3uwlhOj31JCgB9In.CPp.WM7t9pBgQER93FrDFrWCLamDulE7N/X.q9cR0kFGQKfhCcYbdC1"
-    username: dev
+    password: "$6$JL4U1bRzN.Jjjyr9$gQBr1.l68Vf37QNXGN1xywgq0GX4cINWEBK20/tPdrGKeeyQkel/E885BJZRJY/kDakro2e9IaY/MDLOzGq8t0"
+    username: serjimen
   
   ssh:
     install-server: true
@@ -34,7 +34,7 @@ autoinstall:
   late-commands:
     # 1. Asegurar que el grupo docker existe antes de meter al usuario (|| true evita que falle)
     - curtin in-target -- sh -c "getent group docker || groupadd docker"
-    - curtin in-target -- sh -c "usermod -aG docker dev || true"
+    - curtin in-target -- sh -c "usermod -aG docker serjimen || true"
     
     # 2. Hardening de SSH tolerante a fallos
     - curtin in-target -- sh -c "sed -i 's/^#Port.*/Port 22/' /etc/ssh/sshd_config || true"
@@ -52,6 +52,7 @@ autoinstall:
     package_upgrade: true
     runcmd:
       # Esto se ejecuta en el primer arranque, garantizando que el grupo docker no se borre
-      - usermod -aG docker dev
+      - usermod -aG docker serjimen
+      - echo "127.0.0.1 serjimen.42.fr" >> /etc/hosts
 
   shutdown: poweroff
