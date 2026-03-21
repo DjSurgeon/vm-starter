@@ -42,33 +42,35 @@ deps:
 
 clean:
 	@printf "$(C_YELLOW)▶ Removing temporary seed files and configs...$(C_RESET)\n"
-	@rm -f /tmp/seed-*.iso iso/seed-*.iso
+	@rm -f /tmp/seed-*.iso "$(ISO_DIR)"/seed-*.iso
 	@rm -rf cloud-init/user-data cloud-init/meta-data
+	@# Remove legacy local directories if they still exist in the repo
+	@rm -rf iso/ disk_images/
 	@printf "$(C_GREEN)✓ Clean done.$(C_RESET)\n"
 
 vclean: clean
 	@printf "$(C_YELLOW)▶ Removing DevPod VMs (keeping ISO)...$(C_RESET)\n"
-	@for vm in $$(VBoxManage list vms | awk '{print $$1}' | tr -d '"' | grep -E "^devpod-base$$|^web-|^inception-"); do \
+	@# Extract VM names between quotes to handle spaces correctly
+	@VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | grep -E "^($(TEMPLATE_NAME)|web-|inception-)" | while read -r vm; do \
 		printf "  Deleting $$vm...\n"; \
 		VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
 		VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
 	done; \
-	rm -rf $(DISK_IMAGES_DIR)/$(TEMPLATE_NAME) 2>/dev/null || true
+	rm -rf "$(DISK_IMAGES_DIR)" 2>/dev/null || true
 
 fclean:
-	@printf "$(C_RED)⚠ WARNING: This will delete ALL DevPod VMs and files.$(C_RESET)\n"
+	@printf "$(C_RED)⚠ WARNING: This will delete ALL DevPod VMs and binary files.$(C_RESET)\n"
 	@read -p "Are you sure? (y/N) " REPLY; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
 		printf "\n$(C_YELLOW)▶ Removing VMs...$(C_RESET)\n"; \
-		for vm in $$(VBoxManage list vms | awk '{print $$1}' | tr -d '"' | grep -E "^(devpod-base|web|inception)-"); do \
+		VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | grep -E "^($(TEMPLATE_NAME)|web-|inception-)" | while read -r vm; do \
 			printf "  Deleting $$vm...\n"; \
 			VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
 			VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
 		done; \
-		printf "$(C_YELLOW)▶ Removing ISO and seed files...$(C_RESET)\n"; \
-		if [ -n "$(ISO_DIR)" ] && [ -d "$(ISO_DIR)" ]; then \
-			rm -f "$(ISO_DIR)"/*.iso; \
-		fi; \
+		printf "$(C_YELLOW)▶ Removing ISO and binary root...$(C_RESET)\n"; \
+		rm -rf "$(ISO_DIR)" 2>/dev/null || true; \
+		rm -rf "$(DEVPOD_ROOT)" 2>/dev/null || true; \
 		rm -f /tmp/seed-*.iso; \
 		printf "$(C_GREEN)✓ Full clean completed.$(C_RESET)\n"; \
 	else \

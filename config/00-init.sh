@@ -14,11 +14,15 @@ BASE_DIR="$(dirname "$CONFIG_DIR")"
 # -----------------------------------------------------------------------------
 # Define all important directory paths used throughout the project.
 # -----------------------------------------------------------------------------
-DISK_IMAGES_DIR="${BASE_DIR}/disk_images"		# VDI files for VMs
+# Store large binaries (VMs and ISOs) in the user's home directory to keep the repo clean.
+export DEVPOD_ROOT="${HOME}/.devpod"
+DISK_IMAGES_DIR="${DEVPOD_ROOT}/vms"			# VDI files for VMs
+ISO_DIR="${DEVPOD_ROOT}/iso"					# Downloaded Ubuntu ISO
+
+# Keep configuration-related temporary files and logs in the project root (or also move if preferred)
 LOGS_DIR="${BASE_DIR}/logs"						# Log files
-ISO_DIR="${BASE_DIR}/iso"						# Downloaded Ubuntu ISO
-SCRIPTS_DIR="${BASE_DIR}/scripts"				# Post‑install scripts
-CLOUD_INIT_DIR="${BASE_DIR}/cloud-init"			# Generated cloud‑init files
+SCRIPTS_DIR="${BASE_DIR}/scripts"				# Post-install scripts
+CLOUD_INIT_DIR="${BASE_DIR}/cloud-init"			# Generated cloud-init files
 
 # -----------------------------------------------------------------------------
 # Ubuntu ISO Source (Noble Numbat 24.04.1 LTS)

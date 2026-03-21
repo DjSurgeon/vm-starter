@@ -1,43 +1,58 @@
 #!/bin/bash
 # =============================================================================
-# DevPod Configuration – 99-functions.sh
-# Purpose: Provide utility functions for the configuration system.
-# Source order: Must be sourced LAST, after all other config files.
+# config/99-functions.sh – Shared system-wide functions
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Marker function – indicates that the configuration has been successfully loaded.
-# Scripts can check this by running `devpod_config_loaded` and verifying the
-# return code (0 = success). This is useful to ensure that config.sh was sourced
-# before using any variables.
+# Marker function to confirm config loading
 # -----------------------------------------------------------------------------
-devpod_config_loaded() {
-    return 0
+devpod_config_loaded() { return 0; }
+
+# -----------------------------------------------------------------------------
+# 1. UI & Logging Functions
+# -----------------------------------------------------------------------------
+log()     { echo -e "${C_BLUE}[$(date +'%H:%M:%S')]${C_RESET} $*"; }
+success() { echo -e "${C_GREEN}[$(date +'%H:%M:%S')] ✅ $*{C_RESET}"; }
+warn()    { echo -e "${C_YELLOW}[$(date +'%H:%M:%S')] ⚠ $*{C_RESET}"; }
+error()   { echo -e "${C_RED}[$(date +'%H:%M:%S')] ❌ ERROR: $*{C_RESET}" >&2; exit 1; }
+info()    { echo -e "${C_CYAN}[$(date +'%H:%M:%S')] ℹ $*{C_RESET}"; }
+
+# -----------------------------------------------------------------------------
+# 2. Spinner (Reusable)
+# -----------------------------------------------------------------------------
+# Usage: long_command & show_spinner $! "Text..."
+show_spinner() {
+    local pid=$1
+    local msg=$2
+    local spin_chars="/-\|"
+    local spin_idx=0
+
+    while kill -0 "$pid" 2>/dev/null; do
+        printf "\r${C_YELLOW}[%c] %s${C_RESET}" "${spin_chars:$spin_idx:1}" "$msg"
+        spin_idx=$(( (spin_idx + 1) % 4 ))
+        sleep 0.5
+    done
+    printf "\r\033[K" # Clear the line when done
 }
 
 # -----------------------------------------------------------------------------
-# Display a summary of the most important configuration settings.
-# Useful for debugging or confirming that variables are set as expected.
+# 3. Command Checker
+# -----------------------------------------------------------------------------
+check_command() {
+    if ! command -v "$1" &> /dev/null; then
+        error "Command '$1' not found. Please install it (e.g., sudo apt install $2) and try again."
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# 4. Configuration Summary
 # -----------------------------------------------------------------------------
 show_config() {
-    echo "=== DevPod Configuration ==="
-    echo "Template: ${TEMPLATE_NAME} (${TEMPLATE_RAM_MB}MB RAM, ${TEMPLATE_CPU} CPUs)"
-    echo "User: ${ADMIN_USER}"
-    echo "Hostname: ${TEMPLATE_HOSTNAME}"
-    echo "Disk: ${TEMPLATE_DISK_MB}MB (boot: ${PARTITION_BOOT_SIZE_MB}MB)"
-    echo "SSH: host port ${SSH_PORT} → VM port ${SSH_VM_PORT}"
-    echo "Web Clone: ${WEB_CLONE_RAM_MB}MB RAM, ${WEB_CLONE_CPU} CPUs, ${WEB_CLONE_DISK_MB}MB disk"
-    echo "Partitioning: ${FILESYSTEM_ROOT} root, swapfile ${SWAP_SIZE_MB}MB"
-    echo "Packages: base ($(echo ${PACKAGES_BASE} | wc -w) items), Docker ($(echo ${PACKAGES_DOCKER} | wc -w) items)"
-    echo "============================"
+    printf "${C_CYAN}=== DevPod Configuration ===${C_RESET}\n"
+    printf "  ${C_BOLD}Template:${C_RESET} ${TEMPLATE_NAME} (${TEMPLATE_RAM_MB}MB RAM, ${TEMPLATE_CPU} CPUs)\n"
+    printf "  ${C_BOLD}User:${C_RESET}     ${ADMIN_USER}\n"
+    printf "  ${C_BOLD}Hostname:${C_RESET} ${TEMPLATE_HOSTNAME}\n"
+    printf "  ${C_BOLD}SSH:${C_RESET}      host port ${SSH_PORT} → VM port ${SSH_VM_PORT}\n"
+    printf "  ${C_BOLD}Disk:${C_RESET}     ${TEMPLATE_DISK_MB}MB (boot: ${PARTITION_BOOT_SIZE_MB}MB)\n"
+    printf "${C_CYAN}===========================${C_RESET}\n"
 }
-
-# -----------------------------------------------------------------------------
-# USAGE NOTES
-#   - These functions are intended to be called from other scripts after
-#     sourcing config.sh (which in turn sources all 00–99 files).
-#   - `devpod_config_loaded` is a simple sanity check; it does nothing but
-#     confirms that this file was sourced.
-#   - `show_config` prints a human‑readable overview – extend it as needed
-#     when new variables are added to the configuration.
-# -----------------------------------------------------------------------------

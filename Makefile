@@ -15,6 +15,7 @@ include mk/system.mk
 help:
 	@printf "$(C_BOLD)DevPod – Development VM Manager$(C_RESET)\n\n"
 	@printf "Usage:\n"
+	@printf "  $(C_GREEN)make info$(C_RESET)           Show visual dashboard (Disk, VMs, Ports)\n"
 	@printf "  $(C_GREEN)make template$(C_RESET)        Create the base template ($(C_CYAN)$(TEMPLATE_NAME)$(C_RESET))\n"
 	@printf "  $(C_GREEN)make project$(C_RESET)         Create a new project (interactive)\n"
 	@printf "  $(C_GREEN)make project NAME=n TYPE=t$(C_RESET)   Create project with given name and type (web|inception)\n"

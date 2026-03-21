@@ -33,17 +33,17 @@ install_os() {
     log "Waiting for unattended installation to finish (5-10 minutes)..."
     log "The VM will power off automatically when done. Do NOT interrupt."
 
-    # Progress spinner
+    # Progress spinner using global colors
     local spin_chars="/-\|"
     local spin_idx=0
     while true; do
         local state
         state=$(VBoxManage showvminfo "${TEMPLATE_NAME}" --machinereadable | grep VMState= | cut -d= -f2 | tr -d '"')
         if [ "$state" = "poweroff" ]; then
-            echo "" # Clear spinner line
+            printf "\r\033[K" # Clear spinner line
             break
         fi
-        printf "\r\e[1;33m[%c] Installing Ubuntu Server... Please wait...\e[0m" "${spin_chars:$spin_idx:1}"
+        printf "\r${C_YELLOW}[%c] Installing Ubuntu Server... Please wait...${C_RESET}" "${spin_chars:$spin_idx:1}"
         spin_idx=$(( (spin_idx + 1) % 4 ))
         sleep 2
     done

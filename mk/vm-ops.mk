@@ -2,10 +2,37 @@
 # mk/vm-ops.mk – VM operation targets
 # =============================================================================
 
-.PHONY: list start stop ssh status
+.PHONY: list start stop ssh status info
 
 list:
 	@VBoxManage list vms | column -t
+
+info:
+	@printf "$(C_CYAN)╔════════════════════════════════════════════════════════════════╗$(C_RESET)\n"
+	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)DevPod Dashboard$(C_RESET)                                         $(C_CYAN)║$(C_RESET)\n"
+	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
+	@# Disk Space
+	@disk_free=$$(df -h "$(DISK_IMAGES_DIR)" | tail -1 | awk '{print $$4}'); \
+	printf "$(C_CYAN)║$(C_RESET) $(C_YELLOW)Disk Space Available:$(C_RESET) %-37s $(C_CYAN)║$(C_RESET)\n" "$$disk_free"
+	@# Template Status
+	@if VBoxManage showvminfo "$(TEMPLATE_NAME)" >/dev/null 2>&1; then \
+		state=$$(VBoxManage showvminfo "$(TEMPLATE_NAME)" --machinereadable | grep VMState= | cut -d= -f2 | tr -d '"'); \
+		printf "$(C_CYAN)║$(C_RESET) $(C_BLUE)Template:$(C_RESET) %-15s $(C_CYAN)│$(C_RESET) $(C_BLUE)Status:$(C_RESET) %-18s $(C_CYAN)║$(C_RESET)\n" "$(TEMPLATE_NAME)" "$$state"; \
+	else \
+		printf "$(C_CYAN)║$(C_RESET) $(C_BLUE)Template:$(C_RESET) %-15s $(C_CYAN)│$(C_RESET) $(C_RED)Not Found$(C_RESET) %-20s $(C_CYAN)║$(C_RESET)\n" "$(TEMPLATE_NAME)" ""; \
+	fi
+	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
+	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)Running Projects:$(C_RESET)                                      $(C_CYAN)║$(C_RESET)\n"
+	@found=0; \
+	for vm in $$(VBoxManage list runningvms | awk '{print $$1}' | tr -d '"' | grep -E "^(web|inception)-"); do \
+		ssh_port=$$(VBoxManage showvminfo "$$vm" --machinereadable | grep "Forwarding(0)" | grep "guestssh" | cut -d, -f4); \
+		printf "$(C_CYAN)║$(C_RESET)  $(C_GREEN)%-20s$(C_RESET) $(C_CYAN)│$(C_RESET) SSH Port: %-19s $(C_CYAN)║$(C_RESET)\n" "$$vm" "$$ssh_port"; \
+		found=1; \
+	done; \
+	if [ $$found -eq 0 ]; then \
+		printf "$(C_CYAN)║$(C_RESET)  (no projects currently running)                            $(C_CYAN)║$(C_RESET)\n"; \
+	fi
+	@printf "$(C_CYAN)╚════════════════════════════════════════════════════════════════╝$(C_RESET)\n"
 
 start:
 	@if [ -z "$(NAME)" ]; then \
