@@ -15,8 +15,8 @@ autoinstall:
   
   identity:
     hostname: devpod-base
-    password: "$6$JL4U1bRzN.Jjjyr9$gQBr1.l68Vf37QNXGN1xywgq0GX4cINWEBK20/tPdrGKeeyQkel/E885BJZRJY/kDakro2e9IaY/MDLOzGq8t0"
-    username: serjimen
+    password: "$6$Ra6OE/n.LieGCPCJ$JvvkaVPZzR8dekPs8frYvKym3w8jHq4C02CnqsF3BbBIAqT8LcUn8RMsEv5kBIZMBv.36dsePl.kelBzUlheI."
+    username: dev
   
   ssh:
     install-server: true
@@ -28,31 +28,22 @@ autoinstall:
     layout:
       name: direct
   
-  # Usamos el formato de array en línea [pkg1, pkg2] para evitar TODO error de indentación YAML
   packages: [sudo,curl,wget,vim,nano,git,htop,build-essential,python3,python3-pip,python3-venv,ca-certificates,gnupg,apt-transport-https,software-properties-common,docker.io,docker-compose-v2]
   
   late-commands:
-    # 1. Asegurar que el grupo docker existe antes de meter al usuario (|| true evita que falle)
     - curtin in-target -- sh -c "getent group docker || groupadd docker"
-    - curtin in-target -- sh -c "usermod -aG docker serjimen || true"
-    
-    # 2. Hardening de SSH tolerante a fallos
+    - curtin in-target -- sh -c "usermod -aG docker dev || true"
     - curtin in-target -- sh -c "sed -i 's/^#Port.*/Port 22/' /etc/ssh/sshd_config || true"
     - curtin in-target -- sh -c "sed -i 's/^#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config || true"
     - curtin in-target -- sh -c "sed -i 's/^#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config || true"
-    
-    # 3. Creación de la Swap tolerante a fallos
     - curtin in-target -- sh -c "fallocate -l 2048M /swapfile || true"
     - curtin in-target -- sh -c "chmod 600 /swapfile || true"
     - curtin in-target -- sh -c "mkswap /swapfile || true"
     - curtin in-target -- sh -c "grep -q swapfile /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab || true"
 
-# Pasamos configuración nativa de cloud-init para el PRIMER ARRANQUE
   user-data:
     package_upgrade: true
     runcmd:
-      # Esto se ejecuta en el primer arranque, garantizando que el grupo docker no se borre
-      - usermod -aG docker serjimen
-      - echo "127.0.0.1 serjimen.42.fr" >> /etc/hosts
+      - usermod -aG docker dev
 
   shutdown: poweroff
