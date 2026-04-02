@@ -33,3 +33,13 @@ else
     export C_MAGENTA=""
     export C_CYAN=""
 fi
+
+# -----------------------------------------------------------------------------
+# Key Codes (ANSI Escape Sequences)
+# -----------------------------------------------------------------------------
+export KEY_UP=$'\e[A'
+export KEY_DOWN=$'\e[B'
+export KEY_RIGHT=$'\e[C'
+export KEY_LEFT=$'\e[D'
+export KEY_ENTER=""
+export KEY_ESC=$'\e'

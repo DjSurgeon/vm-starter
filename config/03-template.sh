@@ -7,22 +7,22 @@
 # -----------------------------------------------------------------------------
 # Base template identification
 # -----------------------------------------------------------------------------
-export TEMPLATE_NAME="devpod-base"          # Name of the base VM in VirtualBox
-export TEMPLATE_HOSTNAME="devpod-base"      # Hostname inside the VM
+export TEMPLATE_NAME="${TEMPLATE_NAME:-devpod-base}"
+export TEMPLATE_HOSTNAME="${TEMPLATE_HOSTNAME:-devpod-base}"
 
 # -----------------------------------------------------------------------------
 # VirtualBox VM Metadata and Controllers
 # -----------------------------------------------------------------------------
-export TEMPLATE_OSTYPE="Ubuntu_64"          # VirtualBox OS type ID
-export CONTROLLER_SATA="SATA Controller"    # Name for the SATA controller
-export CONTROLLER_IDE="IDE Controller"      # Name for the IDE controller (for ISOs)
+export TEMPLATE_OSTYPE="${TEMPLATE_OSTYPE:-Ubuntu_64}"
+export CONTROLLER_SATA="SATA Controller"
+export CONTROLLER_IDE="IDE Controller"
 
 # -----------------------------------------------------------------------------
 # Hardware resources allocated to the template
 # -----------------------------------------------------------------------------
-export TEMPLATE_RAM_MB="4096"               # RAM in MB (4 GB)
-export TEMPLATE_CPU="2"                     # Number of virtual CPUs
-export TEMPLATE_DISK_MB="30720"             # Disk size in MB (30 GB)
+export TEMPLATE_RAM_MB="${TEMPLATE_RAM_MB:-4096}"
+export TEMPLATE_CPU="${TEMPLATE_CPU:-2}"
+export TEMPLATE_DISK_MB="${TEMPLATE_DISK_MB:-30720}"
 
 # -----------------------------------------------------------------------------
 # Template‑specific directory and disk image path

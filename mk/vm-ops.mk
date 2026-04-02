@@ -12,7 +12,7 @@ info:
 	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)DevPod Dashboard$(C_RESET)                                         $(C_CYAN)║$(C_RESET)\n"
 	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
 	@# Disk Space
-	@disk_free=$$(df -h "$(DISK_IMAGES_DIR)" | tail -1 | awk '{print $$4}'); \
+	@disk_free=$$(df -h "$(DISK_IMAGES_DIR)" 2>/dev/null | tail -1 | awk '{print $$4}') || disk_free="N/A"; \
 	printf "$(C_CYAN)║$(C_RESET) $(C_YELLOW)Disk Space Available:$(C_RESET) %-37s $(C_CYAN)║$(C_RESET)\n" "$$disk_free"
 	@# Template Status
 	@if VBoxManage showvminfo "$(TEMPLATE_NAME)" >/dev/null 2>&1; then \
@@ -24,10 +24,12 @@ info:
 	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
 	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)Running Projects:$(C_RESET)                                      $(C_CYAN)║$(C_RESET)\n"
 	@found=0; \
-	for vm in $$(VBoxManage list runningvms | awk '{print $$1}' | tr -d '"' | grep -E "^(web|inception)-"); do \
-		ssh_port=$$(VBoxManage showvminfo "$$vm" --machinereadable | grep "Forwarding(0)" | grep "guestssh" | cut -d, -f4); \
-		printf "$(C_CYAN)║$(C_RESET)  $(C_GREEN)%-20s$(C_RESET) $(C_CYAN)│$(C_RESET) SSH Port: %-19s $(C_CYAN)║$(C_RESET)\n" "$$vm" "$$ssh_port"; \
-		found=1; \
+	for vm in $$(VBoxManage list runningvms | awk '{print $$1}' | tr -d '"'); do \
+		ssh_port=$$(VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep "Forwarding" | grep "guestssh" | cut -d, -f4); \
+		if [ -n "$$ssh_port" ]; then \
+			printf "$(C_CYAN)║$(C_RESET)  $(C_GREEN)%-20s$(C_RESET) $(C_CYAN)│$(C_RESET) SSH Port: %-19s $(C_CYAN)║$(C_RESET)\n" "$$vm" "$$ssh_port"; \
+			found=1; \
+		fi \
 	done; \
 	if [ $$found -eq 0 ]; then \
 		printf "$(C_CYAN)║$(C_RESET)  (no projects currently running)                            $(C_CYAN)║$(C_RESET)\n"; \
@@ -53,11 +55,13 @@ ssh:
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make ssh NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
-	@if [ "$(NAME)" = "$(TEMPLATE_NAME)" ]; then \
-		printf "$(C_CYAN)▶ Connecting to base template ($(TEMPLATE_NAME))...$(C_RESET)\n"; \
-		ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $(SSH_PORT) $(ADMIN_USER)@127.0.0.1; \
+	@# Try to detect the SSH port from VirtualBox port forwarding rules
+	@ssh_port=$$(VBoxManage showvminfo "$(NAME)" --machinereadable 2>/dev/null | grep "Forwarding" | grep "guestssh" | cut -d, -f4); \
+	if [ -n "$$ssh_port" ]; then \
+		printf "$(C_CYAN)▶ Connecting to '$(NAME)' on port $$ssh_port...$(C_RESET)\n"; \
+		ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $$ssh_port $(ADMIN_USER)@127.0.0.1; \
 	else \
-		printf "$(C_CYAN)▶ Connecting to project '$(NAME)'...$(C_RESET)\n"; \
+		printf "$(C_CYAN)▶ Connecting to project '$(NAME)' via SSH alias...$(C_RESET)\n"; \
 		ssh $(NAME); \
 	fi
 
@@ -72,13 +76,18 @@ status:
 	fi
 	@printf "$(C_BOLD)Projects:$(C_RESET)\n"
 	@found=0; \
-	for vm in $$(VBoxManage list vms | awk '{print $$1}' | tr -d '"' | grep -E "^(web|inception)-"); do \
-		state=$$(VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep VMState= | cut -d= -f2 | tr -d '"'); \
-		printf "  $$vm: $$state\n"; \
-		found=1; \
+	for vm in $$(VBoxManage list vms | awk '{print $$1}' | tr -d '"'); do \
+		if [ "$$vm" != "$(TEMPLATE_NAME)" ]; then \
+			ssh_port=$$(VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep "Forwarding" | grep "guestssh" | cut -d, -f4); \
+			if [ -n "$$ssh_port" ]; then \
+				state=$$(VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep VMState= | cut -d= -f2 | tr -d '"'); \
+				printf "  $$vm: $$state (SSH Port: $$ssh_port)\n"; \
+				found=1; \
+			fi \
+		fi \
 	done; \
 	if [ $$found -eq 0 ]; then \
 		printf "  (no projects found)\n"; \
 	fi
 	@printf "$(C_BOLD)SSH aliases:$(C_RESET)\n"
-	@grep -E "^Host (web|inception)-" ~/.ssh/config 2>/dev/null | sed 's/Host /  /' || printf "  (none)\n"
+	@grep -E "^Host " ~/.ssh/config 2>/dev/null | grep -E "(web|inception)-" | sed 's/Host /  /' || printf "  (none)\n"

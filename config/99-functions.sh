@@ -11,11 +11,21 @@ devpod_config_loaded() { return 0; }
 # -----------------------------------------------------------------------------
 # 1. UI & Logging Functions
 # -----------------------------------------------------------------------------
-log()     { echo -e "${C_BLUE}[$(date +'%H:%M:%S')]${C_RESET} $*"; }
-success() { echo -e "${C_GREEN}[$(date +'%H:%M:%S')] ✅ $*{C_RESET}"; }
-warn()    { echo -e "${C_YELLOW}[$(date +'%H:%M:%S')] ⚠ $*{C_RESET}"; }
-error()   { echo -e "${C_RED}[$(date +'%H:%M:%S')] ❌ ERROR: $*{C_RESET}" >&2; exit 1; }
-info()    { echo -e "${C_CYAN}[$(date +'%H:%M:%S')] ℹ $*{C_RESET}"; }
+# Helper to write to log file if LOG_FILE is defined
+_log_to_file() {
+    if [ -n "$LOG_FILE" ]; then
+        # Ensure log directory exists
+        mkdir -p "$(dirname "$LOG_FILE")"
+        # Strip ANSI colors for the log file
+        echo -e "$*" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    fi
+}
+
+log()     { local m="[$(date +'%H:%M:%S')] $*"; echo -e "${C_BLUE}$m${C_RESET}"; _log_to_file "$m"; }
+success() { local m="[$(date +'%H:%M:%S')] ✅ $*"; echo -e "${C_GREEN}$m${C_RESET}"; _log_to_file "$m"; }
+warn()    { local m="[$(date +'%H:%M:%S')] ⚠ $*"; echo -e "${C_YELLOW}$m${C_RESET}"; _log_to_file "$m"; }
+error()   { local m="[$(date +'%H:%M:%S')] ❌ ERROR: $*"; echo -e "${C_RED}$m${C_RESET}" >&2; _log_to_file "$m"; exit 1; }
+info()    { local m="[$(date +'%H:%M:%S')] ℹ $*"; echo -e "${C_CYAN}$m${C_RESET}"; _log_to_file "$m"; }
 
 # -----------------------------------------------------------------------------
 # 2. Spinner (Reusable)
@@ -55,4 +65,105 @@ show_config() {
     printf "  ${C_BOLD}SSH:${C_RESET}      host port ${SSH_PORT} → VM port ${SSH_VM_PORT}\n"
     printf "  ${C_BOLD}Disk:${C_RESET}     ${TEMPLATE_DISK_MB}MB (boot: ${PARTITION_BOOT_SIZE_MB}MB)\n"
     printf "${C_CYAN}===========================${C_RESET}\n"
+}
+
+# -----------------------------------------------------------------------------
+# 5. Key Capture (Interactive UI)
+# -----------------------------------------------------------------------------
+# Reads a single key (including arrow keys)
+get_key() {
+    local key next_chars
+    # Use -r to prevent backslash escaping, -s for silent, -n1 for one char
+    IFS= read -rsn1 key
+    # If key is empty, it means Enter was pressed
+    if [[ -z "$key" ]]; then
+        printf ""
+        return
+    fi
+    # If key is Escape (\e), check for following chars (arrow keys)
+    if [[ $key == $'\e' ]]; then
+        read -rsn2 -t 0.001 next_chars
+        key+="$next_chars"
+    fi
+    printf "%s" "$key"
+}
+
+# -----------------------------------------------------------------------------
+# 6. Interactive Selection Menu (ui_select)
+# -----------------------------------------------------------------------------
+# Usage: ui_select "Choose an option:" "Option 1" "Option 2" "Option 3"
+# Returns: The index of the selected option (0-based) in global variable UI_SELECT_RESULT
+ui_select() {
+    local prompt="$1"
+    shift
+    local options=("$@")
+    local current_idx=0
+    local num_options=${#options[@]}
+    local key
+
+    # Hide cursor
+    printf "\033[?25l"
+
+    while true; do
+        # Print prompt and options
+        printf "\r${C_BOLD}${C_CYAN}?${C_RESET} ${C_BOLD}%s${C_RESET}\n" "$prompt"
+        for i in "${!options[@]}"; do
+            if [ "$i" -eq "$current_idx" ]; then
+                printf "  ${C_CYAN}❯ %s${C_RESET}\n" "${options[$i]}"
+            else
+                printf "    %s\n" "${options[$i]}"
+            fi
+        done
+
+        # Read key
+        key=$(get_key)
+
+        # Process key
+        if [[ "$key" == "$KEY_UP" ]]; then
+            current_idx=$(( (current_idx - 1 + num_options) % num_options ))
+        elif [[ "$key" == "$KEY_DOWN" ]]; then
+            current_idx=$(( (current_idx + 1) % num_options ))
+        elif [[ "$key" == "$KEY_ENTER" ]]; then
+            # Clean up and return
+            printf "\033[%dA\r\033[K" $((num_options + 1))
+            printf "${C_GREEN}✔${C_RESET} ${C_BOLD}%s${C_RESET} ${C_CYAN}%s${C_RESET}\n" "$prompt" "${options[$current_idx]}"
+            UI_SELECT_RESULT=$current_idx
+            printf "\033[?25h" # Show cursor
+            return 0
+        elif [[ "$key" == "$KEY_ESC" || "$key" == "q" ]]; then
+            printf "\033[%dA\r\033[K" $((num_options + 1))
+            printf "\033[?25h" # Show cursor
+            return 1
+        fi
+
+        # Move cursor back up to redraw
+        printf "\033[%dA" $((num_options + 1))
+    done
+}
+
+# -----------------------------------------------------------------------------
+# 7. Interactive Text Input (ui_input)
+# -----------------------------------------------------------------------------
+# Usage: ui_input "Enter hostname:" "devpod-vm"
+# Returns: The entered string (or default) in global variable UI_INPUT_RESULT
+ui_input() {
+    local prompt="$1"
+    local default="$2"
+    local input
+
+    printf "${C_BOLD}${C_CYAN}?${C_RESET} ${C_BOLD}%s${C_RESET} ${C_YELLOW}(%s)${C_RESET}: " "$prompt" "$default"
+    read -r input
+    
+    # Clean input: remove ANY carriage returns or non-printable chars
+    input=$(echo "$input" | tr -d '\r\n')
+
+    if [ -z "$input" ]; then
+        UI_INPUT_RESULT="$default"
+    else
+        UI_INPUT_RESULT="$input"
+    fi
+
+    # Visual feedback
+    printf "\033[1A\r\033[K"
+    printf "${C_GREEN}✔${C_RESET} ${C_BOLD}%s${C_RESET} ${C_CYAN}%s${C_RESET}\n" "$prompt" "$UI_INPUT_RESULT"
 }

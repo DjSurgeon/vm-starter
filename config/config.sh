@@ -11,6 +11,15 @@ CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Enable debug output (set to true to see which files are loaded)
 DEBUG_LOAD=${DEBUG_LOAD:-false}
 
+# Load temporary wizard configuration FIRST if it exists
+# This allows overriding variables before they are used in 00-init.sh
+if [ -f "$CONFIG_DIR/wizard_config.sh" ]; then
+    if [ "$DEBUG_LOAD" = true ]; then
+        echo "Loading wizard config: wizard_config.sh"
+    fi
+    source "$CONFIG_DIR/wizard_config.sh"
+fi
+
 # Load all numbered modules in order (00-*.sh, 01-*.sh, ...)
 for config_file in $(ls "$CONFIG_DIR"/[0-9][0-9]-*.sh 2>/dev/null | sort); do
     if [ -f "$config_file" ]; then

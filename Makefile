@@ -15,6 +15,7 @@ include mk/system.mk
 help:
 	@printf "$(C_BOLD)DevPod – Development VM Manager$(C_RESET)\n\n"
 	@printf "Usage:\n"
+	@printf "  $(C_GREEN)make create$(C_RESET)         Launch the interactive wizard (Vite-like UI)\n"
 	@printf "  $(C_GREEN)make info$(C_RESET)           Show visual dashboard (Disk, VMs, Ports)\n"
 	@printf "  $(C_GREEN)make template$(C_RESET)        Create the base template ($(C_CYAN)$(TEMPLATE_NAME)$(C_RESET))\n"
 	@printf "  $(C_GREEN)make project$(C_RESET)         Create a new project (interactive)\n"
@@ -29,3 +30,34 @@ help:
 	@printf "  $(C_GREEN)make clean$(C_RESET)           Remove ISOs and seed files (keep VMs)\n"
 	@printf "  $(C_GREEN)make fclean$(C_RESET)          Remove everything (VMs, ISOs, seeds) – use with care!\n"
 	@printf "  $(C_GREEN)make re$(C_RESET)              Full rebuild (fclean + template)\n\n"
+
+# 4. Wizard target
+create:
+	@chmod +x scripts/wizard.sh
+	@./scripts/wizard.sh
+
+# 5. Clean target
+clean:
+	@make clean-iso
+	@make clean-seeds
+
+# 6. Full clean target
+fclean: clean
+	@make fclean-vm
+
+# 7. Rebuild target
+re: fclean
+	@make template
+
+# 5. Clean target
+clean:
+	@make clean-iso
+	@make clean-seeds
+
+# 6. Full clean target
+fclean: clean
+	@make fclean-vm
+
+# 7. Rebuild target
+re: fclean
+	@make template

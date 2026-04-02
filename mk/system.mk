@@ -50,11 +50,18 @@ clean:
 
 vclean: clean
 	@printf "$(C_YELLOW)▶ Removing DevPod VMs (keeping ISO)...$(C_RESET)\n"
-	@# Extract VM names between quotes to handle spaces correctly
-	@VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | grep -E "^($(TEMPLATE_NAME)|web-|inception-)" | while read -r vm; do \
-		printf "  Deleting $$vm...\n"; \
-		VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
-		VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
+	@# Identify DevPod VMs: either by name prefix or by having a 'guestssh' rule
+	@VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
+		is_devpod=0; \
+		if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then is_devpod=1; fi; \
+		if [ $$is_devpod -eq 0 ]; then \
+			if VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep -q "guestssh"; then is_devpod=1; fi; \
+		fi; \
+		if [ $$is_devpod -eq 1 ]; then \
+			printf "  Deleting $$vm...\n"; \
+			VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
+			VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
+		fi \
 	done; \
 	rm -rf "$(DISK_IMAGES_DIR)" 2>/dev/null || true
 
@@ -63,10 +70,17 @@ fclean:
 	@read -p "Are you sure? (y/N) " REPLY; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
 		printf "\n$(C_YELLOW)▶ Removing VMs...$(C_RESET)\n"; \
-		VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | grep -E "^($(TEMPLATE_NAME)|web-|inception-)" | while read -r vm; do \
-			printf "  Deleting $$vm...\n"; \
-			VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
-			VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
+		VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
+			is_devpod=0; \
+			if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then is_devpod=1; fi; \
+			if [ $$is_devpod -eq 0 ]; then \
+				if VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep -q "guestssh"; then is_devpod=1; fi; \
+			fi; \
+			if [ $$is_devpod -eq 1 ]; then \
+				printf "  Deleting $$vm...\n"; \
+				VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
+				VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
+			fi \
 		done; \
 		printf "$(C_YELLOW)▶ Removing ISO and binary root...$(C_RESET)\n"; \
 		rm -rf "$(ISO_DIR)" 2>/dev/null || true; \

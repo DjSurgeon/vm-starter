@@ -4,10 +4,14 @@
 # =============================================================================
 
 manage_iso() {
-    if [ ! -f "${UBUNTU_ISO_PATH}" ]; then
-        log "Downloading Ubuntu 24.04 Server ISO..."
-        wget -q --show-progress -O "${UBUNTU_ISO_PATH}" "${UBUNTU_ISO_URL}"
+    if [ -z "$ISO_URL" ]; then
+        error "No ISO URL defined for distro: ${SELECTED_DISTRO}"
+    fi
+
+    if [ ! -f "${ISO_PATH}" ]; then
+        log "Downloading ${SELECTED_DISTRO} ISO..."
+        wget -q --show-progress -O "${ISO_PATH}" "${ISO_URL}"
     else
-        success "Ubuntu ISO already exists: ${UBUNTU_ISO_FILENAME}"
+        success "ISO already exists: ${ISO_FILENAME}"
     fi
 }
