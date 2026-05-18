@@ -35,29 +35,3 @@ help:
 create:
 	@chmod +x scripts/wizard.sh
 	@./scripts/wizard.sh
-
-# 5. Clean target
-clean:
-	@make clean-iso
-	@make clean-seeds
-
-# 6. Full clean target
-fclean: clean
-	@make fclean-vm
-
-# 7. Rebuild target
-re: fclean
-	@make template
-
-# 5. Clean target
-clean:
-	@make clean-iso
-	@make clean-seeds
-
-# 6. Full clean target
-fclean: clean
-	@make fclean-vm
-
-# 7. Rebuild target
-re: fclean
-	@make template

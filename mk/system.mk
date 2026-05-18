@@ -52,12 +52,7 @@ vclean: clean
 	@printf "$(C_YELLOW)▶ Removing DevPod VMs (keeping ISO)...$(C_RESET)\n"
 	@# Identify DevPod VMs: either by name prefix or by having a 'guestssh' rule
 	@VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
-		is_devpod=0; \
-		if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then is_devpod=1; fi; \
-		if [ $$is_devpod -eq 0 ]; then \
-			if VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep -q "guestssh"; then is_devpod=1; fi; \
-		fi; \
-		if [ $$is_devpod -eq 1 ]; then \
+		if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then \
 			printf "  Deleting $$vm...\n"; \
 			VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
 			VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \
@@ -71,12 +66,7 @@ fclean:
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
 		printf "\n$(C_YELLOW)▶ Removing VMs...$(C_RESET)\n"; \
 		VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
-			is_devpod=0; \
-			if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then is_devpod=1; fi; \
-			if [ $$is_devpod -eq 0 ]; then \
-				if VBoxManage showvminfo "$$vm" --machinereadable 2>/dev/null | grep -q "guestssh"; then is_devpod=1; fi; \
-			fi; \
-			if [ $$is_devpod -eq 1 ]; then \
+			if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then \
 				printf "  Deleting $$vm...\n"; \
 				VBoxManage controlvm "$$vm" poweroff 2>/dev/null || true; \
 				VBoxManage unregistervm "$$vm" --delete 2>/dev/null || true; \

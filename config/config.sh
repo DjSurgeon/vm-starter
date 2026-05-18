@@ -21,7 +21,8 @@ if [ -f "$CONFIG_DIR/wizard_config.sh" ]; then
 fi
 
 # Load all numbered modules in order (00-*.sh, 01-*.sh, ...)
-for config_file in $(ls "$CONFIG_DIR"/[0-9][0-9]-*.sh 2>/dev/null | sort); do
+for config_file in "$CONFIG_DIR"/[0-9][0-9]-*.sh; do
+    [ -e "$config_file" ] || continue
     if [ -f "$config_file" ]; then
         if [ "$DEBUG_LOAD" = true ]; then
             echo "Loading config: $(basename "$config_file")"

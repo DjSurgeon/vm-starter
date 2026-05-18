@@ -1,0 +1,118 @@
+#!/bin/bash
+# =============================================================================
+# scripts/clone.sh – Create a project VM from the base template
+# =============================================================================
+
+set -e
+
+# 1. Load central configuration
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${PROJECT_ROOT}/config/config.sh" || { echo "❌ Error: Could not load config.sh"; exit 1; }
+
+# -----------------------------------------------------------------------------
+# 2. Input Validation
+# -----------------------------------------------------------------------------
+PROJECT_NAME="$1"
+PROJECT_TYPE="$2"
+
+if [ -z "$PROJECT_NAME" ] || [ -z "$PROJECT_TYPE" ]; then
+    error "Usage: $0 <name> <type (web|inception)>"
+fi
+
+if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" ]]; then
+    error "Invalid project type: $PROJECT_TYPE. Must be 'web' or 'inception'."
+fi
+
+# Ensure base template exists
+if ! VBoxManage showvminfo "$TEMPLATE_NAME" >/dev/null 2>&1; then
+    error "Base template '$TEMPLATE_NAME' not found. Run 'make template' first."
+fi
+
+# -----------------------------------------------------------------------------
+# 3. Resource and Name Calculation
+# -----------------------------------------------------------------------------
+if [ "$PROJECT_TYPE" = "web" ]; then
+    PREFIX="$WEB_PREFIX"
+    RAM="$WEB_CLONE_RAM_MB"
+    CPU="$WEB_CLONE_CPU"
+else
+    PREFIX="$INCEPTION_PREFIX"
+    RAM="$INCEPTION_CLONE_RAM_MB"
+    CPU="$INCEPTION_CLONE_CPU"
+fi
+
+VM_NAME="${PREFIX}-${PROJECT_NAME}"
+
+# Ensure VM doesn't already exist
+if VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
+    error "VM '$VM_NAME' already exists. Choose a different name."
+fi
+
+# -----------------------------------------------------------------------------
+# 4. Cloning the VM
+# -----------------------------------------------------------------------------
+log "Cloning template '$TEMPLATE_NAME' into project VM '$VM_NAME'..."
+VBoxManage clonevm "$TEMPLATE_NAME" --name "$VM_NAME" --register --mode all --options keepallmacs --options keepdisknames
+
+# -----------------------------------------------------------------------------
+# 5. Resource Allocation
+# -----------------------------------------------------------------------------
+log "Configuring resources: ${RAM}MB RAM, ${CPU} CPUs..."
+VBoxManage modifyvm "$VM_NAME" --memory "$RAM" --cpus "$CPU"
+
+# -----------------------------------------------------------------------------
+# 6. Dynamic Port Allocation
+# -----------------------------------------------------------------------------
+log "Finding an available host port for SSH..."
+
+# Get all used ports from VirtualBox NAT forwarding rules
+USED_PORTS=$(VBoxManage list vms | awk '{print $1}' | tr -d '"' | xargs -I {} VBoxManage showvminfo {} --machinereadable 2>/dev/null | grep "Forwarding" | cut -d, -f4 | sort -n | uniq)
+
+AVAILABLE_PORT=""
+for port in $(seq "$SSH_PORT_RANGE_START" "$SSH_PORT_RANGE_END"); do
+    if ! echo "$USED_PORTS" | grep -q "^${port}$"; then
+        AVAILABLE_PORT="$port"
+        break
+    fi
+done
+
+if [ -z "$AVAILABLE_PORT" ]; then
+    error "No available ports found in range ${SSH_PORT_RANGE_START}-${SSH_PORT_RANGE_END}."
+fi
+
+success "Selected port: $AVAILABLE_PORT"
+
+# Add NAT port forwarding rule
+log "Setting up SSH port forwarding (Host:${AVAILABLE_PORT} -> VM:${SSH_VM_PORT})..."
+VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,,$AVAILABLE_PORT,,$SSH_VM_PORT"
+
+# -----------------------------------------------------------------------------
+# 7. SSH Config Update
+# -----------------------------------------------------------------------------
+log "Updating ~/.ssh/config for alias '$VM_NAME'..."
+
+SSH_CONFIG_ENTRY="
+Host ${VM_NAME}
+    HostName 127.0.0.1
+    User ${ADMIN_USER}
+    Port ${AVAILABLE_PORT}
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
+"
+
+# Create .ssh dir if it doesn't exist
+mkdir -p "$HOME/.ssh"
+touch "$HOME/.ssh/config"
+
+# Remove existing entry if it exists to avoid duplicates
+if grep -q "Host ${VM_NAME}" "$HOME/.ssh/config"; then
+    # This is a bit complex with sed, so we'll just append and assume the user manages their config
+    # A better way would be to use a block marker.
+    warn "Entry for 'Host ${VM_NAME}' already exists in ~/.ssh/config. Appending new one."
+fi
+
+printf "%s" "$SSH_CONFIG_ENTRY" >> "$HOME/.ssh/config"
+
+success "Project '$VM_NAME' created successfully!"
+info "To connect, run: make ssh NAME=$VM_NAME or simply: ssh $VM_NAME"
