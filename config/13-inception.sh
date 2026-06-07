@@ -10,11 +10,11 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# DIRECTORY STRUCTURE (inside the VM project folder)
-# These are the paths required by the Inception subject.
+# DIRECTORY STRUCTURE (inside the project repo folder ~/inception/)
+# These are the paths required by the Inception subject v5.3.
 # -----------------------------------------------------------------------------
 export INCEPTION_SRCS_DIR="srcs"                    # Root of the project sources
-export INCEPTION_SECRETS_DIR="secrets"              # For Docker secrets (optional but recommended)
+export INCEPTION_SECRETS_DIR="secrets"              # Must be at repo root, same level as srcs/
 export INCEPTION_REQUIREMENTS_DIR="srcs/requirements" # Contains each service's subdirectory
 
 # -----------------------------------------------------------------------------
