@@ -43,7 +43,7 @@ export INCEPTION_BONUS_SERVICES=(
 # The host port 8443 is a development convenience (maps to VM's port 443).
 # -----------------------------------------------------------------------------
 export INCEPTION_NGINX_PORT="443"               # Internal port where nginx listens (HTTPS)
-export INCEPTION_NGINX_PORT_HOST="8443"         # Host port forwarded to VM's port 443
+export INCEPTION_NGINX_PORT_HOST="443"         # Host port forwarded to VM's port 443
 
 # -----------------------------------------------------------------------------
 # TLS CONFIGURATION

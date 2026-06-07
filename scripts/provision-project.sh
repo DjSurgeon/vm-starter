@@ -31,79 +31,35 @@ if [ "$PROJECT_TYPE" = "web" ]; then
 EOF
 
 elif [ "$PROJECT_TYPE" = "inception" ]; then
-    log "Creating Inception folder structure..."
+    log "Running clean provisioning for Inception..."
     ssh -q -o StrictHostKeyChecking=no "$VM_NAME" <<EOF
-        # Create physical data folders for Docker volumes on the host VM
-        echo "${ADMIN_PASSWORD}" | sudo -S mkdir -p /home/${ADMIN_USER}/data/wordpress
-        echo "${ADMIN_PASSWORD}" | sudo -S mkdir -p /home/${ADMIN_USER}/data/mariadb
-        echo "${ADMIN_PASSWORD}" | sudo -S chown -R ${ADMIN_USER}:${ADMIN_USER} /home/${ADMIN_USER}/data
+        echo "===================================================="
+        echo "  Aprovisionamiento Limpio de Inception para: ${ADMIN_USER}"
+        echo "===================================================="
 
-        # Create Inception project root simulating the git repository
-        mkdir -p ~/inception/${INCEPTION_SRCS_DIR}/requirements/nginx
-        mkdir -p ~/inception/${INCEPTION_SRCS_DIR}/requirements/wordpress
-        mkdir -p ~/inception/${INCEPTION_SRCS_DIR}/requirements/mariadb
-        mkdir -p ~/inception/${INCEPTION_SECRETS_DIR}
+        # 1. Configuración Real del archivo /etc/hosts
+        echo "Fixing /etc/hosts inside the VM..."
+        if ! grep -q "${INCEPTION_DOMAIN}" /etc/hosts; then
+            echo "${ADMIN_PASSWORD}" | sudo -S sh -c 'echo "127.0.0.1    ${INCEPTION_DOMAIN}" >> /etc/hosts' > /dev/null
+            echo "[OK] Dominio ${INCEPTION_DOMAIN} enlazado a 127.0.0.1"
+        fi
+
+        # 2. Estructura de Persistencia en el Host
+        echo "Creating physical volume paths on the host..."
+        echo "${ADMIN_PASSWORD}" | sudo -S mkdir -p "/home/${ADMIN_USER}/data/mariadb"
+        echo "${ADMIN_PASSWORD}" | sudo -S mkdir -p "/home/${ADMIN_USER}/data/wordpress"
         
-        # Create Makefile at the root of the project
-        cat <<'MK' > ~/inception/Makefile
-all:
-	cd srcs && docker compose up -d --build
+        # Asegurar permisos
+        echo "${ADMIN_PASSWORD}" | sudo -S chown -R ${ADMIN_USER}:${ADMIN_USER} "/home/${ADMIN_USER}/data" 2>/dev/null || true
+        echo "${ADMIN_PASSWORD}" | sudo -S chmod -R 755 "/home/${ADMIN_USER}/data"
+        echo "[OK] Carpetas de datos creadas en /home/${ADMIN_USER}/data"
 
-down:
-	cd srcs && docker compose down
+        # 3. Limpieza de entorno
+        rm -rf /home/${ADMIN_USER}/inception
 
-clean: down
-	docker system prune -a
-
-fclean: clean
-	sudo rm -rf /home/${ADMIN_USER}/data/wordpress/*
-	sudo rm -rf /home/${ADMIN_USER}/data/mariadb/*
-
-re: fclean all
-
-.PHONY: all down clean fclean re
-MK
-
-        # Create docker-compose.yml stub in srcs/ with Named Volumes mapped to host path
-        cat <<'DC' > ~/inception/${INCEPTION_SRCS_DIR}/docker-compose.yml
-version: '3'
-services:
-  nginx:
-    build: requirements/nginx
-    ports:
-      - "${INCEPTION_NGINX_PORT_HOST}:${INCEPTION_NGINX_PORT}"
-    volumes:
-      - wordpress_data:/var/www/html
-      
-  wordpress:
-    build: requirements/wordpress
-    volumes:
-      - wordpress_data:/var/www/html
-      
-  mariadb:
-    build: requirements/mariadb
-    volumes:
-      - mariadb_data:/var/lib/mysql
-
-volumes:
-  wordpress_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/${ADMIN_USER}/data/wordpress
-  mariadb_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/${ADMIN_USER}/data/mariadb
-DC
-
-        # Create a basic .env stub in srcs/
-        cat <<'ENV' > ~/inception/${INCEPTION_SRCS_DIR}/.env
-DOMAIN_NAME=${INCEPTION_DOMAIN}
-ENV
+        echo "===================================================="
+        echo "  ¡VM lista! Entra, clona tu repo en tu HOME y ejecuta make"
+        echo "===================================================="
 EOF
 fi
 
