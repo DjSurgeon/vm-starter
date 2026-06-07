@@ -2,7 +2,7 @@
 # mk/vm-ops.mk – VM operation targets
 # =============================================================================
 
-.PHONY: list start stop ssh status info
+.PHONY: list start stop ssh status info rm
 
 list:
 	@VBoxManage list vms | column -t
@@ -50,6 +50,23 @@ stop:
 	@VBoxManage controlvm "$(NAME)" acpipowerbutton 2>/dev/null || \
 	 VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || \
 	 printf "$(C_YELLOW)⚠ VM '$(NAME)' is not running.$(C_RESET)\n"
+
+rm:
+	@if [ -z "$(NAME)" ]; then \
+		printf "$(C_RED)Error: missing NAME. Use: make rm NAME=<vm-name>$(C_RESET)\n"; exit 1; \
+	fi
+	@if ! VBoxManage showvminfo "$(NAME)" >/dev/null 2>&1; then \
+		printf "$(C_RED)Error: VM '$(NAME)' does not exist.$(C_RESET)\n"; exit 1; \
+	fi
+	@if ! echo "$(NAME)" | grep -Eq "^($(TEMPLATE_NAME)|web-|inception-)"; then \
+		printf "$(C_RED)Error: VM '$(NAME)' is not a DevPod VM. Aborting for safety.$(C_RESET)\n"; exit 1; \
+	fi
+	@printf "$(C_YELLOW)▶ Deleting VM '$(NAME)'...$(C_RESET)\n"
+	@VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || true
+	@VBoxManage unregistervm "$(NAME)" --delete 2>/dev/null || true
+	@printf "$(C_YELLOW)▶ Cleaning SSH alias for '$(NAME)'...$(C_RESET)\n"
+	@awk -v host="Host $(NAME)" '$$0 == host { skip=1; next } skip && /^Host / { skip=0 } !skip { print }' ~/.ssh/config > ~/.ssh/config.tmp && mv ~/.ssh/config.tmp ~/.ssh/config 2>/dev/null || true
+	@printf "$(C_GREEN)✓ VM '$(NAME)' deleted.$(C_RESET)\n"
 
 ssh:
 	@if [ -z "$(NAME)" ]; then \

@@ -4,25 +4,11 @@
 # =============================================================================
 
 install_os() {
-    # 1. Aseguramos que el servidor escuche en todas las interfaces (0.0.0.0)
-    log "Starting temporary HTTP server for Debian preseed..."
-    # Usamos un puerto menos común para evitar conflictos
-    cd "${CLOUD_INIT_DIR}" && python3 -m http.server 8080 > /dev/null 2>&1 &
-    HTTP_PID=$!
-    
-    # Damos un segundo para que el servidor levante
-    sleep 2
-
     log "Starting VM in headless mode..."
     VBoxManage startvm "${TEMPLATE_NAME}" --type headless
 
-    if [ "$SELECTED_DISTRO" = "debian" ]; then
-        log "Injecting Debian preseed via HTTP..."
-        automate_debian_boot
-    else
-        log "Injecting Ubuntu autoinstall parameters..."
-        automate_ubuntu_grub
-    fi
+    log "Injecting Ubuntu autoinstall parameters..."
+    automate_ubuntu_grub
 
     # 2. Bucle de espera ROBUSTO
     while true; do
@@ -42,28 +28,8 @@ install_os() {
         sleep 10
     done
 
-    kill $HTTP_PID
     printf "\n"
     success "Installation completed. VM has powered off."
-}
-
-automate_debian_boot() {
-    sleep 12 # Tiempo para que cargue el menú de Debian
-
-    # 1. Presionamos ESC para llegar al prompt 'boot:'
-    VBoxManage controlvm "${TEMPLATE_NAME}" keyboardputscancode 01 81
-    sleep 2
-
-    # 2. Comando de boot apuntando a nuestro servidor local (Host)
-    # Cambiamos file:///media/ por http://10.0.2.2:8080/
-    local boot_cmd="auto url=http://10.0.2.2:8080/preseed.cfg priority=critical locale=${LOCALE} keymap=${KEYBOARD_LAYOUT} interface=auto"
-    
-    log "Typing boot command: $boot_cmd"
-    VBoxManage controlvm "${TEMPLATE_NAME}" keyboardputstring "$boot_cmd"
-    sleep 2
-
-    # 3. ENTER para arrancar
-    VBoxManage controlvm "${TEMPLATE_NAME}" keyboardputscancode 1c 9c
 }
 
 automate_ubuntu_grub() {

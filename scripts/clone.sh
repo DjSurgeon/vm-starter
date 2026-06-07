@@ -84,6 +84,7 @@ success "Selected port: $AVAILABLE_PORT"
 
 # Add NAT port forwarding rule
 log "Setting up SSH port forwarding (Host:${AVAILABLE_PORT} -> VM:${SSH_VM_PORT})..."
+VBoxManage modifyvm "$VM_NAME" --natpf1 delete "guestssh" 2>/dev/null || true
 VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,,$AVAILABLE_PORT,,$SSH_VM_PORT"
 
 # -----------------------------------------------------------------------------
@@ -106,13 +107,40 @@ mkdir -p "$HOME/.ssh"
 touch "$HOME/.ssh/config"
 
 # Remove existing entry if it exists to avoid duplicates
-if grep -q "Host ${VM_NAME}" "$HOME/.ssh/config"; then
-    # This is a bit complex with sed, so we'll just append and assume the user manages their config
-    # A better way would be to use a block marker.
-    warn "Entry for 'Host ${VM_NAME}' already exists in ~/.ssh/config. Appending new one."
+if grep -q "^Host ${VM_NAME}$" "$HOME/.ssh/config"; then
+    warn "Cleaning old entry for 'Host ${VM_NAME}' in ~/.ssh/config."
+    awk -v host="Host ${VM_NAME}" '
+        $0 == host { skip=1; next }
+        skip && /^Host / { skip=0 }
+        !skip { print }
+    ' "$HOME/.ssh/config" > "$HOME/.ssh/config.tmp" && mv "$HOME/.ssh/config.tmp" "$HOME/.ssh/config"
 fi
 
 printf "%s" "$SSH_CONFIG_ENTRY" >> "$HOME/.ssh/config"
+
+# -----------------------------------------------------------------------------
+# 8. Project Provisioning
+# -----------------------------------------------------------------------------
+log "Waiting for VM to boot for provisioning..."
+# Start the VM to provision it
+VBoxManage startvm "$VM_NAME" --type headless
+
+# Wait for SSH to be ready
+log "Waiting for SSH to be ready on port $AVAILABLE_PORT..."
+for i in {1..60}; do
+    if ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -p "$AVAILABLE_PORT" "${ADMIN_USER}@127.0.0.1" exit 2>/dev/null; then
+        break
+    fi
+    sleep 2
+done
+
+# Run provisioning script
+if [ -f "${PROJECT_ROOT}/scripts/provision-project.sh" ]; then
+    log "Running project provisioning..."
+    "${PROJECT_ROOT}/scripts/provision-project.sh" "$VM_NAME" "$PROJECT_TYPE"
+else
+    warn "Provisioning script not found at scripts/provision-project.sh"
+fi
 
 success "Project '$VM_NAME' created successfully!"
 info "To connect, run: make ssh NAME=$VM_NAME or simply: ssh $VM_NAME"

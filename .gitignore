@@ -43,4 +43,4 @@ Thumbs.db
 # 6. Carpetas de Entornos de Desarrollo (Opcional, pero recomendado)
 .vscode/
 .idea/
-*.swp
+*.swpconfig/local_env.sh

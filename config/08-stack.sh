@@ -29,12 +29,10 @@ export DEV_CONTAINERS=(
 
 # Base OS versions – must be penultimate stable (no "latest" tags allowed).
 export INCEPTION_ALPINE_VERSION="3.18"        # Penultimate stable Alpine (current latest is 3.19)
-export INCEPTION_DEBIAN_VERSION="bookworm"    # Debian 12 (stable)
 
 # Allowed base images – these are the only ones that may be used in Dockerfiles.
 export INCEPTION_BASE_IMAGES=(
     "alpine:${INCEPTION_ALPINE_VERSION}"
-    "debian:${INCEPTION_DEBIAN_VERSION}-slim"
 )
 
 # PHP version for WordPress (with php-fpm). Must match official images.

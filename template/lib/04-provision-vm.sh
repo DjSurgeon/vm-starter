@@ -5,11 +5,7 @@
 
 provision_vm() {
     # Determine OS Type for VirtualBox
-    if [ "$SELECTED_DISTRO" = "debian" ]; then
-        TEMPLATE_OSTYPE="Debian_64"
-    else
-        TEMPLATE_OSTYPE="Ubuntu_64"
-    fi
+    TEMPLATE_OSTYPE="Ubuntu_64"
 
     log "Destroying old VM if exists for a clean slate..."
     VBoxManage controlvm "${TEMPLATE_NAME}" poweroff 2>/dev/null || true

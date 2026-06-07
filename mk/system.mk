@@ -49,6 +49,10 @@ clean:
 	@printf "$(C_GREEN)✓ Clean done.$(C_RESET)\n"
 
 vclean: clean
+	@printf "$(C_YELLOW)▶ Forgetting inaccessible VMs...$(C_RESET)\n"
+	@VBoxManage list vms | grep '"<inaccessible>"' | awk '{print $$2}' | tr -d '{}' | while read uuid; do \
+		VBoxManage unregistervm "$$uuid" 2>/dev/null || true; \
+	done || true
 	@printf "$(C_YELLOW)▶ Removing DevPod VMs (keeping ISO)...$(C_RESET)\n"
 	@# Identify DevPod VMs: either by name prefix or by having a 'guestssh' rule
 	@VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
@@ -59,12 +63,18 @@ vclean: clean
 		fi \
 	done; \
 	rm -rf "$(DISK_IMAGES_DIR)" 2>/dev/null || true
+	@printf "$(C_YELLOW)▶ Cleaning SSH aliases for DevPod VMs...$(C_RESET)\n"
+	@perl -0777 -pi -e 's/\nHost (web-|inception-).*?(?=\nHost |\z)//gs' ~/.ssh/config 2>/dev/null || true
 
 fclean:
 	@printf "$(C_RED)⚠ WARNING: This will delete ALL DevPod VMs and binary files.$(C_RESET)\n"
 	@read -p "Are you sure? (y/N) " REPLY; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		printf "\n$(C_YELLOW)▶ Removing VMs...$(C_RESET)\n"; \
+		printf "\n$(C_YELLOW)▶ Forgetting inaccessible VMs...$(C_RESET)\n"; \
+		VBoxManage list vms | grep '"<inaccessible>"' | awk '{print $$2}' | tr -d '{}' | while read uuid; do \
+			VBoxManage unregistervm "$$uuid" 2>/dev/null || true; \
+		done || true; \
+		printf "$(C_YELLOW)▶ Removing VMs...$(C_RESET)\n"; \
 		VBoxManage list vms | sed 's/"\(.*\)".*/\1/' | while read -r vm; do \
 			if [[ "$$vm" =~ ^($(TEMPLATE_NAME)|web-|inception-) ]]; then \
 				printf "  Deleting $$vm...\n"; \
@@ -76,6 +86,8 @@ fclean:
 		rm -rf "$(ISO_DIR)" 2>/dev/null || true; \
 		rm -rf "$(DEVPOD_ROOT)" 2>/dev/null || true; \
 		rm -f /tmp/seed-*.iso; \
+		printf "$(C_YELLOW)▶ Cleaning SSH aliases for DevPod VMs...$(C_RESET)\n"; \
+		perl -0777 -pi -e 's/\nHost (web-|inception-).*?(?=\nHost |\z)//gs' ~/.ssh/config 2>/dev/null || true; \
 		printf "$(C_GREEN)✓ Full clean completed.$(C_RESET)\n"; \
 	else \
 		printf "\n$(C_YELLOW)Aborted.$(C_RESET)\n"; \
