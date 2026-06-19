@@ -52,7 +52,7 @@ fi
 # 4. Cloning the VM
 # -----------------------------------------------------------------------------
 log "Cloning template '$TEMPLATE_NAME' into project VM '$VM_NAME'..."
-VBoxManage clonevm "$TEMPLATE_NAME" --name "$VM_NAME" --register --mode all --options keepallmacs --options keepdisknames
+VBoxManage clonevm "$TEMPLATE_NAME" --name "$VM_NAME" --register --basefolder "${DISK_IMAGES_DIR}" --mode all --options keepallmacs --options keepdisknames
 
 # -----------------------------------------------------------------------------
 # 5. Resource Allocation

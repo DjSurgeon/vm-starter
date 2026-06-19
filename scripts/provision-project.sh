@@ -17,6 +17,44 @@ fi
 
 log "Provisioning '$VM_NAME' as a '$PROJECT_TYPE' project..."
 
+# Update the hostname inside the VM to match the clone's name
+log "Updating hostname to '$VM_NAME'..."
+ssh -q -o StrictHostKeyChecking=no "$VM_NAME" <<EOF
+    echo "${ADMIN_PASSWORD}" | sudo -S hostnamectl set-hostname "$VM_NAME"
+    echo "${ADMIN_PASSWORD}" | sudo -S sed -i 's/127.0.1.1.*/127.0.1.1\t$VM_NAME/g' /etc/hosts
+EOF
+
+# Disable noisy default Ubuntu MOTD and configure 42-style dynamic MOTD
+log "Configuring 42-style dynamic MOTD..."
+ssh -q -o StrictHostKeyChecking=no "$VM_NAME" <<EOF
+    echo "${ADMIN_PASSWORD}" | sudo -S chmod -x /etc/update-motd.d/10-help-text /etc/update-motd.d/50-motd-news /etc/update-motd.d/50-ubuntu-adv 2>/dev/null || true
+
+    echo "${ADMIN_PASSWORD}" | sudo -S sh -c "cat << 'EOF_MOTD' > /etc/update-motd.d/99-devpod
+#!/bin/bash
+CORES=\\\$(nproc)
+RAM=\\\$(free -m | awk '/^Mem:/ {print \\\$2}')
+DISK=\\\$(df -h / | awk 'NR==2 {print \\\$4}')
+HOST=\\\$(hostname)
+USER_NAME=\\\$USER
+
+echo \"\"
+printf \"/* ************************************************************************** */\\\n\"
+printf \"/*                                                                            */\\\n\"
+printf \"/*                                                        :::      ::::::::   */\\\n\"
+printf \"/*   %-47s    :+:      :+:    :+:   */\\\n\" \"INCEPTION DEV ENVIRONMENT\"
+printf \"/*                                                    +:+ +:+         +:+     */\\\n\"
+printf \"/*   Hostname: %-37s+#+  +:+       +#+        */\\\n\" \"\\\$HOST\"
+printf \"/*   Resources: %-36s+#+#+#+#+#+   +#+           */\\\n\" \"\\\$CORES Cores | \\\${RAM}MB RAM | \\\$DISK Free\"
+printf \"/*   Sudo Pass: %-36s     #+#    #+#             */\\\n\" \"tempuser123\"
+printf \"/*   Data Dir: %-37s    ###   ########.fr       */\\\n\" \"/home/\\\$USER_NAME/data\"
+printf \"/*                                                                            */\\\n\"
+printf \"/* ************************************************************************** */\\\n\"
+echo \"\"
+EOF_MOTD"
+
+    echo "${ADMIN_PASSWORD}" | sudo -S chmod +x /etc/update-motd.d/99-devpod
+EOF
+
 # Run the provisioning commands via SSH
 if [ "$PROJECT_TYPE" = "web" ]; then
     log "Installing Node.js ${DEV_NODE_VERSION} and pnpm ${DEV_PNPM_VERSION}..."
