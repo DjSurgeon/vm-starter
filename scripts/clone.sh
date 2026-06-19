@@ -97,6 +97,7 @@ Host ${VM_NAME}
     HostName 127.0.0.1
     User ${ADMIN_USER}
     Port ${AVAILABLE_PORT}
+    ForwardAgent yes
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
     LogLevel ERROR

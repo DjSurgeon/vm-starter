@@ -29,24 +29,23 @@ log "Configuring 42-style dynamic MOTD..."
 ssh -q -o StrictHostKeyChecking=no "$VM_NAME" <<EOF
     echo "${ADMIN_PASSWORD}" | sudo -S chmod -x /etc/update-motd.d/10-help-text /etc/update-motd.d/50-motd-news /etc/update-motd.d/50-ubuntu-adv 2>/dev/null || true
 
-    echo "${ADMIN_PASSWORD}" | sudo -S sh -c "cat << 'EOF_MOTD' > /etc/update-motd.d/99-devpod
+    echo "${ADMIN_PASSWORD}" | sudo -S sh -c "cat << EOF_MOTD > /etc/update-motd.d/99-devpod
 #!/bin/bash
 CORES=\\\$(nproc)
 RAM=\\\$(free -m | awk '/^Mem:/ {print \\\$2}')
 DISK=\\\$(df -h / | awk 'NR==2 {print \\\$4}')
 HOST=\\\$(hostname)
-USER_NAME=\\\$USER
 
 echo \"\"
 printf \"/* ************************************************************************** */\\\n\"
 printf \"/*                                                                            */\\\n\"
 printf \"/*                                                        :::      ::::::::   */\\\n\"
-printf \"/*   %-47s    :+:      :+:    :+:   */\\\n\" \"INCEPTION DEV ENVIRONMENT\"
-printf \"/*                                                    +:+ +:+         +:+     */\\\n\"
-printf \"/*   Hostname: %-37s+#+  +:+       +#+        */\\\n\" \"\\\$HOST\"
-printf \"/*   Resources: %-36s+#+#+#+#+#+   +#+           */\\\n\" \"\\\$CORES Cores | \\\${RAM}MB RAM | \\\$DISK Free\"
-printf \"/*   Sudo Pass: %-36s     #+#    #+#             */\\\n\" \"tempuser123\"
-printf \"/*   Data Dir: %-37s    ###   ########.fr       */\\\n\" \"/home/\\\$USER_NAME/data\"
+printf \"/*   %-51s:+:      :+:    :+:   */\\\n\" \"INCEPTION DEV ENVIRONMENT\"
+printf \"/*   %-49s+:+ +:+         +:+     */\\\n\" \"\"
+printf \"/*   %-47s+#+  +:+       +#+        */\\\n\" \"Hostname: \\\$HOST\"
+printf \"/*   %-45s+#+#+#+#+#+   +#+           */\\\n\" \"Resources: \\\$CORES Cores | \\\${RAM}MB RAM | \\\$DISK Free\"
+printf \"/*   %-50s#+#    #+#             */\\\n\" \"Sudo Pass: ${ADMIN_PASSWORD}\"
+printf \"/*   %-49s###   ########.fr       */\\\n\" \"Data Dir: /home/${ADMIN_USER}/data\"
 printf \"/*                                                                            */\\\n\"
 printf \"/* ************************************************************************** */\\\n\"
 echo \"\"
