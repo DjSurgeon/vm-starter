@@ -7,6 +7,7 @@ set -e
 
 # 1. Load central configuration
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=/dev/null
 source "${PROJECT_ROOT}/config/config.sh" || { echo "❌ Error: Could not load config.sh"; exit 1; }
 
 # -----------------------------------------------------------------------------

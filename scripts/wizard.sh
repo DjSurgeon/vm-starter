@@ -8,6 +8,7 @@ set -e
 
 # Get project root and source config
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=/dev/null
 source "${PROJECT_ROOT}/config/config.sh"
 
 # -----------------------------------------------------------------------------

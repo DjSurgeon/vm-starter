@@ -273,3 +273,24 @@ done
 ```
 
 **Why we do this**: It allows us to build scalable, plugin-based architectures while keeping the linter happy and showing that we understand the limits of static analysis.
+
+---
+
+### [SC1091] Not following: file was not specified as input
+
+**Severity**: Info (Linter Limitation / Architecture Exception)
+**Context**: Occurs when you `source` a file with a static path, but ShellCheck is configured to analyze files in isolation without following external sources.
+
+#### ❌ The Problem (Linter Limitation)
+If you do `source config.sh`, ShellCheck can either read `config.sh` and combine it with your current file, or it can analyze your current file in isolation. In CI/CD pipelines (like GitHub Actions), we run the linter on every file individually to save time and compute costs. Therefore, ShellCheck warns you: *"I see you are importing config.sh, but I'm not going to open it right now"*.
+
+#### ✅ The Solution (Enterprise Standard)
+Since GitHub Actions will analyze `config.sh` later when its turn arrives, we don't need the linter to analyze it twice. We use `# shellcheck source=/dev/null` to explicitly tell the linter to treat the imported file as an empty file and continue.
+
+```bash
+# GOOD: Explicitly tell ShellCheck to ignore the external file contents
+# shellcheck source=/dev/null
+source "${PROJECT_ROOT}/config/config.sh"
+```
+
+**Why we do this**: It optimizes our CI/CD pipeline. Instead of a quadratic ($O(n^2)$) execution time where the linter re-reads the config file for every script that imports it, we achieve a linear ($O(n)$) execution time, saving compute resources and reducing CI costs.

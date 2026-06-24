@@ -17,6 +17,7 @@ if [ -f "$CONFIG_DIR/local_env.sh" ]; then
     if [ "$DEBUG_LOAD" = true ]; then
         echo "Loading local config: local_env.sh"
     fi
+    # shellcheck source=/dev/null
     source "$CONFIG_DIR/local_env.sh"
 fi
 
@@ -37,6 +38,7 @@ if [ -f "$CONFIG_DIR/99-functions.sh" ]; then
     if [ "$DEBUG_LOAD" = true ]; then
         echo "Loading config: 99-functions.sh"
     fi
+    # shellcheck source=/dev/null
     source "$CONFIG_DIR/99-functions.sh"
 else
     echo "Warning: 99-functions.sh not found. Some features may not work." >&2

@@ -9,6 +9,7 @@ set -e  # Exit immediately if any command fails
 
 # 1. Load central configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
 source "${SCRIPT_DIR}/../config/config.sh" || { echo "❌ Error: Could not load config.sh"; exit 1; }
 
 # 2. Source modular libraries
