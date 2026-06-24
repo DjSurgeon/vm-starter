@@ -105,3 +105,33 @@ EOF
 ```
 
 **Why we do this**: It creates a clean barrier between local variables and remote execution, eliminating the need for complex escaping and preventing injection bugs.
+
+---
+
+### [SC2155] Declare and assign separately to avoid masking return values
+
+**Severity**: High (Error Handling / Bug)
+**Context**: Occurs when you declare a local variable and assign it a command substitution on the same line, which breaks the `set -e` (Fail Fast) policy.
+
+#### ❌ The Problem (Anti-Pattern)
+In our scripts, we use `set -e` so that if any command fails, the script aborts immediately. However, the `local` keyword is itself a command that always returns `0` (Success). If you assign the variable on the same line, it masks the failure of the underlying command.
+
+```bash
+# BAD: If 'failing_command' fails, the script will NOT abort
+# because 'local' returns a success code (0).
+local my_var="$(failing_command)"
+```
+
+#### ✅ The Solution (Enterprise Standard)
+Always declare the variable first, and then assign the value on the next statement. This ensures the return code of the command substitution is correctly captured by `set -e`.
+
+```bash
+# GOOD: The failure of 'failing_command' will trigger 'set -e' and abort the script.
+local my_var
+my_var="$(failing_command)"
+
+# GOOD: For one-liners (like logging functions), separate statements with a semicolon.
+log() { local m; m="[$(date +'%H:%M:%S')] $*"; echo "$m"; }
+```
+
+**Why we do this**: It guarantees that silent failures don't creep into our automation, respecting our strict "Fail Fast" policy.

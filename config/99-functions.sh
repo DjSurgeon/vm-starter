@@ -21,11 +21,11 @@ _log_to_file() {
     fi
 }
 
-log()     { local m="[$(date +'%H:%M:%S')] $*"; echo -e "${C_BLUE}$m${C_RESET}"; _log_to_file "$m"; }
-success() { local m="[$(date +'%H:%M:%S')] ✅ $*"; echo -e "${C_GREEN}$m${C_RESET}"; _log_to_file "$m"; }
-warn()    { local m="[$(date +'%H:%M:%S')] ⚠ $*"; echo -e "${C_YELLOW}$m${C_RESET}"; _log_to_file "$m"; }
-error()   { local m="[$(date +'%H:%M:%S')] ❌ ERROR: $*"; echo -e "${C_RED}$m${C_RESET}" >&2; _log_to_file "$m"; exit 1; }
-info()    { local m="[$(date +'%H:%M:%S')] ℹ $*"; echo -e "${C_CYAN}$m${C_RESET}"; _log_to_file "$m"; }
+log()     { local m; m="[$(date +'%H:%M:%S')] $*"; echo -e "${C_BLUE}$m${C_RESET}"; _log_to_file "$m"; }
+success() { local m; m="[$(date +'%H:%M:%S')] ✅ $*"; echo -e "${C_GREEN}$m${C_RESET}"; _log_to_file "$m"; }
+warn()    { local m; m="[$(date +'%H:%M:%S')] ⚠ $*"; echo -e "${C_YELLOW}$m${C_RESET}"; _log_to_file "$m"; }
+error()   { local m; m="[$(date +'%H:%M:%S')] ❌ ERROR: $*"; echo -e "${C_RED}$m${C_RESET}" >&2; _log_to_file "$m"; exit 1; }
+info()    { local m; m="[$(date +'%H:%M:%S')] ℹ $*"; echo -e "${C_CYAN}$m${C_RESET}"; _log_to_file "$m"; }
 
 # -----------------------------------------------------------------------------
 # 2. Spinner (Reusable)
@@ -59,11 +59,11 @@ check_command() {
 # -----------------------------------------------------------------------------
 show_config() {
     printf "%b\n" "${C_CYAN}=== VM-Starter Configuration ===${C_RESET}"
-    printf "  ${C_BOLD}Template:${C_RESET} ${TEMPLATE_NAME} (${TEMPLATE_RAM_MB}MB RAM, ${TEMPLATE_CPU} CPUs)\n"
-    printf "  ${C_BOLD}User:${C_RESET}     ${ADMIN_USER}\n"
-    printf "  ${C_BOLD}Hostname:${C_RESET} ${TEMPLATE_HOSTNAME}\n"
-    printf "  ${C_BOLD}SSH:${C_RESET}      host port ${SSH_PORT} → VM port ${SSH_VM_PORT}\n"
-    printf "  ${C_BOLD}Disk:${C_RESET}     ${TEMPLATE_DISK_MB}MB (boot: ${PARTITION_BOOT_SIZE_MB}MB)\n"
+    printf "  %bTemplate:%b %s (%sMB RAM, %s CPUs)\n" "${C_BOLD}" "${C_RESET}" "${TEMPLATE_NAME}" "${TEMPLATE_RAM_MB}" "${TEMPLATE_CPU}"
+    printf "  %bUser:%b     %s\n" "${C_BOLD}" "${C_RESET}" "${ADMIN_USER}"
+    printf "  %bHostname:%b %s\n" "${C_BOLD}" "${C_RESET}" "${TEMPLATE_HOSTNAME}"
+    printf "  %bSSH:%b      host port %s → VM port %s\n" "${C_BOLD}" "${C_RESET}" "${SSH_PORT}" "${SSH_VM_PORT}"
+    printf "  %bDisk:%b     %sMB (boot: %sMB)\n" "${C_BOLD}" "${C_RESET}" "${TEMPLATE_DISK_MB}" "${PARTITION_BOOT_SIZE_MB}"
     printf "%b\n" "${C_CYAN}===========================${C_RESET}"
 }
 
