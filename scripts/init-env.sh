@@ -28,14 +28,14 @@ echo "Select the storage location:"
 echo "1) User Home (~/.vm-starter) [Default]"
 echo "2) Current Directory ($PROJECT_ROOT/.vm-starter-data)"
 echo "3) Custom Path (e.g. /goinfre/$USER/vm-starter)"
-read -p "Enter choice [1-3]: " choice
+read -r -p "Enter choice [1-3]: " choice
 
 case $choice in
     2)
         CUSTOM_PATH="$PROJECT_ROOT/.vm-starter-data"
         ;;
     3)
-        read -p "Enter absolute path: " CUSTOM_PATH
+        read -r -p "Enter absolute path: " CUSTOM_PATH
         ;;
     *)
         CUSTOM_PATH="$HOME/.vm-starter"
@@ -46,7 +46,7 @@ esac
 CUSTOM_PATH=$(echo "$CUSTOM_PATH" | tr -d '\r' | sed 's:/*$::')
 
 echo ""
-read -p "What username do you want for the VM? [$USER]: " VM_USERNAME
+read -r -p "What username do you want for the VM? [$USER]: " VM_USERNAME
 VM_USERNAME=${VM_USERNAME:-$USER}
 VM_USERNAME=$(echo "$VM_USERNAME" | tr -d '\r')
 

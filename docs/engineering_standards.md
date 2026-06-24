@@ -44,3 +44,27 @@ printf "%b\n" "${C_CYAN}${C_BOLD}🚀 Welcome${C_RESET}"
 ```
 
 **Why we do this**: It guarantees that user input or dynamic variables will never execute arbitrary format sequences, ensuring the script remains secure and predictable.
+
+---
+
+### [SC2162] read without -r will mangle backslashes
+
+**Severity**: Medium (Data Integrity / Bug)
+**Context**: This error occurs when `read` is used without the `-r` flag to capture user input.
+
+#### ❌ The Problem (Anti-Pattern)
+```bash
+# BAD: If the user inputs a path with backslashes like C:\dev,
+# Bash will consume the backslashes as escape characters.
+read -p "Enter absolute path: " CUSTOM_PATH
+```
+
+#### ✅ The Solution (Enterprise Standard)
+Always use the `-r` (raw) flag when reading user input to ensure backslashes are interpreted literally.
+
+```bash
+# GOOD: Using -r ensures data is captured exactly as typed.
+read -r -p "Enter absolute path: " CUSTOM_PATH
+```
+
+**Why we do this**: It prevents unexpected behavior when users input paths or strings containing backslashes, guaranteeing data integrity.
