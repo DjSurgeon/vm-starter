@@ -1,5 +1,5 @@
 # =============================================================================
-# DevPod Makefile – Modular Entry Point
+# VM-Starter Makefile – Modular Entry Point
 # =============================================================================
 
 # 1. Include modular components
@@ -13,7 +13,7 @@ include mk/system.mk
 
 # 3. Help target
 help:
-	@printf "$(C_BOLD)DevPod – Development VM Manager$(C_RESET)\n\n"
+	@printf "$(C_BOLD)VM-Starter – Development VM Manager$(C_RESET)\n\n"
 	@printf "Usage:\n"
 	@printf "  $(C_GREEN)make init$(C_RESET)           Configure storage path (Opcional, useful for 42 Campus)\n"
 	@printf "  $(C_GREEN)make create$(C_RESET)         Launch the interactive wizard to clone a new project\n"

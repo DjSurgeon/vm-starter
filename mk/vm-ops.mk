@@ -9,7 +9,7 @@ list:
 
 info:
 	@printf "$(C_CYAN)╔════════════════════════════════════════════════════════════════╗$(C_RESET)\n"
-	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)DevPod Dashboard$(C_RESET)                                         $(C_CYAN)║$(C_RESET)\n"
+	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)VM-Starter Dashboard$(C_RESET)                                         $(C_CYAN)║$(C_RESET)\n"
 	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
 	@# Disk Space
 	@disk_free=$$(df -h "$(DISK_IMAGES_DIR)" 2>/dev/null | tail -1 | awk '{print $$4}') || disk_free="N/A"; \
@@ -59,7 +59,7 @@ rm:
 		printf "$(C_RED)Error: VM '$(NAME)' does not exist.$(C_RESET)\n"; exit 1; \
 	fi
 	@if ! echo "$(NAME)" | grep -Eq "^($(TEMPLATE_NAME)|web-|inception-)"; then \
-		printf "$(C_RED)Error: VM '$(NAME)' is not a DevPod VM. Aborting for safety.$(C_RESET)\n"; exit 1; \
+		printf "$(C_RED)Error: VM '$(NAME)' is not a VM-Starter VM. Aborting for safety.$(C_RESET)\n"; exit 1; \
 	fi
 	@printf "$(C_YELLOW)▶ Deleting VM '$(NAME)'...$(C_RESET)\n"
 	@VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || true
@@ -83,7 +83,7 @@ ssh:
 	fi
 
 status:
-	@printf "$(C_CYAN)=== DevPod Status ===$(C_RESET)\n"
+	@printf "$(C_CYAN)=== VM-Starter Status ===$(C_RESET)\n"
 	@printf "$(C_BOLD)Template:$(C_RESET)\n"
 	@if VBoxManage showvminfo "$(TEMPLATE_NAME)" >/dev/null 2>&1; then \
 		state=$$(VBoxManage showvminfo "$(TEMPLATE_NAME)" --machinereadable | grep VMState= | cut -d= -f2 | tr -d '"'); \
