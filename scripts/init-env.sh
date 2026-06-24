@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# scripts/init-env.sh – DevPod Initial Configuration Setup
+# scripts/init-env.sh – VM-Starter Initial Configuration Setup
 # Purpose: Allow the user to specify custom paths (like 42 campus /goinfre)
 #          before creating the base template.
 # =============================================================================
@@ -19,26 +19,26 @@ C_BLUE='\033[1;34m'
 C_YELLOW='\033[1;33m'
 
 clear
-printf "${C_CYAN}${C_BOLD}🚀 DevPod Initial Setup${C_RESET}\n"
-printf "${C_BLUE}Let's configure where DevPod stores your VMs and ISOs.${C_RESET}\n"
-printf "${C_YELLOW}This is especially useful for 42 Campus (to use /goinfre or /sgoinfre).${C_RESET}\n\n"
+printf "%b\n" "${C_CYAN}${C_BOLD}🚀 VM-Starter Initial Setup${C_RESET}"
+printf "%b\n" "${C_BLUE}Let's configure where VM-Starter stores your VMs and ISOs.${C_RESET}"
+printf "%b\n\n" "${C_YELLOW}This is especially useful for 42 Campus (to use /goinfre or /sgoinfre).${C_RESET}"
 
 # A basic select if we don't want to rely on ui_select before config is generated
 echo "Select the storage location:"
-echo "1) User Home (~/.devpod) [Default]"
-echo "2) Current Directory ($PROJECT_ROOT/.devpod-data)"
-echo "3) Custom Path (e.g. /goinfre/$USER/devpod)"
+echo "1) User Home (~/.vm-starter) [Default]"
+echo "2) Current Directory ($PROJECT_ROOT/.vm-starter-data)"
+echo "3) Custom Path (e.g. /goinfre/$USER/vm-starter)"
 read -p "Enter choice [1-3]: " choice
 
 case $choice in
     2)
-        CUSTOM_PATH="$PROJECT_ROOT/.devpod-data"
+        CUSTOM_PATH="$PROJECT_ROOT/.vm-starter-data"
         ;;
     3)
         read -p "Enter absolute path: " CUSTOM_PATH
         ;;
     *)
-        CUSTOM_PATH="$HOME/.devpod"
+        CUSTOM_PATH="$HOME/.vm-starter"
         ;;
 esac
 
@@ -58,7 +58,7 @@ export DEVPOD_ROOT="$CUSTOM_PATH"
 export ADMIN_USER="$VM_USERNAME"
 EOF
 
-printf "\n${C_GREEN}✔ Configuration saved!${C_RESET}\n"
-printf "  - VMs will be stored in: $CUSTOM_PATH\n"
-printf "  - VM Main User: $VM_USERNAME\n\n"
-printf "You can now run: ${C_BOLD}make template${C_RESET}\n"
+printf "\n%b\n" "${C_GREEN}✔ Configuration saved!${C_RESET}"
+printf "  - VMs will be stored in: %s\n" "$CUSTOM_PATH"
+printf "  - VM Main User: %s\n\n" "$VM_USERNAME"
+printf "You can now run: %b\n" "${C_BOLD}make template${C_RESET}"
