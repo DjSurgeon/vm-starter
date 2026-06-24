@@ -68,3 +68,40 @@ read -r -p "Enter absolute path: " CUSTOM_PATH
 ```
 
 **Why we do this**: It prevents unexpected behavior when users input paths or strings containing backslashes, guaranteeing data integrity.
+
+---
+
+### [SC2087] Quote 'EOF' to make here document expansions happen on the server side
+
+**Severity**: High (Security / Readability)
+**Context**: Occurs when running commands on a remote server via SSH using a HereDoc (`<<EOF`) without quoting the `EOF`.
+
+#### ❌ The Problem (Anti-Pattern)
+If you don't quote `EOF`, your **local** computer evaluates all variables (like `$VAR`) *before* sending the script to the remote server. 
+1. If you actually want a variable to evaluate on the remote server (like `$(hostname)`), you are forced to escape it with ugly backslashes (`\$(hostname)` or `\\\$(hostname)`).
+2. It's vulnerable to local variable injection.
+
+```bash
+# BAD: The local computer replaces $ADMIN_PASSWORD. 
+# But it also replaces $HOST locally before the server even sees it!
+ssh user@server <<EOF
+    echo "${ADMIN_PASSWORD}" > /secret.txt
+    echo "Mi servidor es: \$HOST"
+EOF
+```
+
+#### ✅ The Solution (Enterprise Standard: SSH Bash-Args)
+Always quote `'EOF'` so the script is sent safely and literally to the server. To pass local variables, pass them as arguments to `bash -s`.
+
+```bash
+# GOOD: Quote 'EOF'. Pass local variables as arguments ($1, $2).
+ssh user@server "bash -s" -- "$ADMIN_PASSWORD" <<'EOF'
+    REMOTE_PASS="$1"
+    echo "${REMOTE_PASS}" > /secret.txt
+    
+    # We can now use server-side variables cleanly without !
+    echo "Mi servidor es: $(hostname)" escaping
+EOF
+```
+
+**Why we do this**: It creates a clean barrier between local variables and remote execution, eliminating the need for complex escaping and preventing injection bugs.
