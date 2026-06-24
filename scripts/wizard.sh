@@ -14,8 +14,8 @@ source "${PROJECT_ROOT}/config/config.sh"
 # 1. Welcome Message
 # -----------------------------------------------------------------------------
 clear
-printf "${C_CYAN}${C_BOLD}🚀 DevPod Interactive Wizard${C_RESET}\n"
-printf "${C_BLUE}Let's create a new project environment.${C_RESET}\n\n"
+printf "%b\n" "${C_CYAN}${C_BOLD}🚀 VM-Starter Interactive Wizard${C_RESET}"
+printf "%b\n\n" "${C_BLUE}Let's create a new project environment.${C_RESET}"
 
 # -----------------------------------------------------------------------------
 # 2. Project Name (ui_input)
@@ -39,10 +39,10 @@ fi
 # 4. Summary & Confirmation
 # -----------------------------------------------------------------------------
 printf "\n${C_CYAN}=== Configuration Summary ===${C_RESET}\n"
-printf "  ${C_BOLD}Project Name:${C_RESET} $PROJECT_NAME\n"
-printf "  ${C_BOLD}Project Type:${C_RESET} $PROJECT_TYPE\n"
-printf "  ${C_BOLD}Template:${C_RESET}     $TEMPLATE_NAME\n"
-printf "${C_CYAN}=============================${C_RESET}\n\n"
+printf "  ${C_BOLD}Project Name:${C_RESET} %s\n" "$PROJECT_NAME"
+printf "  ${C_BOLD}Project Type:${C_RESET} %s\n" "$PROJECT_TYPE"
+printf "  ${C_BOLD}Template:${C_RESET}     %s\n" "$TEMPLATE_NAME"
+printf "%b\n\n" "${C_CYAN}=============================${C_RESET}"
 
 CONFIRM_OPTIONS=("Yes, create it!" "No, start over" "Cancel")
 ui_select "Does this look correct?" "${CONFIRM_OPTIONS[@]}"

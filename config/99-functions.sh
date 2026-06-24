@@ -58,13 +58,13 @@ check_command() {
 # 4. Configuration Summary
 # -----------------------------------------------------------------------------
 show_config() {
-    printf "${C_CYAN}=== DevPod Configuration ===${C_RESET}\n"
+    printf "%b\n" "${C_CYAN}=== VM-Starter Configuration ===${C_RESET}"
     printf "  ${C_BOLD}Template:${C_RESET} ${TEMPLATE_NAME} (${TEMPLATE_RAM_MB}MB RAM, ${TEMPLATE_CPU} CPUs)\n"
     printf "  ${C_BOLD}User:${C_RESET}     ${ADMIN_USER}\n"
     printf "  ${C_BOLD}Hostname:${C_RESET} ${TEMPLATE_HOSTNAME}\n"
     printf "  ${C_BOLD}SSH:${C_RESET}      host port ${SSH_PORT} → VM port ${SSH_VM_PORT}\n"
     printf "  ${C_BOLD}Disk:${C_RESET}     ${TEMPLATE_DISK_MB}MB (boot: ${PARTITION_BOOT_SIZE_MB}MB)\n"
-    printf "${C_CYAN}===========================${C_RESET}\n"
+    printf "%b\n" "${C_CYAN}===========================${C_RESET}"
 }
 
 # -----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ ui_select() {
         elif [[ "$key" == "$KEY_ENTER" ]]; then
             # Clean up and return
             printf "\033[%dA\r\033[K" $((num_options + 1))
-            printf "${C_GREEN}✔${C_RESET} ${C_BOLD}%s${C_RESET} ${C_CYAN}%s${C_RESET}\n" "$prompt" "${options[$current_idx]}"
+            printf "%b %b%s%b %b%s%b\n" "${C_GREEN}✔${C_RESET}" "${C_BOLD}" "$prompt" "${C_RESET}" "${C_CYAN}" "${options[$current_idx]}" "${C_RESET}"
             UI_SELECT_RESULT=$current_idx
             printf "\033[?25h" # Show cursor
             return 0
@@ -151,7 +151,7 @@ ui_input() {
     local default="$2"
     local input
 
-    printf "${C_BOLD}${C_CYAN}?${C_RESET} ${C_BOLD}%s${C_RESET} ${C_YELLOW}(%s)${C_RESET}: " "$prompt" "$default"
+    printf "%b %b%s%b %b(%s)%b: " "${C_BOLD}${C_CYAN}?${C_RESET}" "${C_BOLD}" "$prompt" "${C_RESET}" "${C_YELLOW}" "$default" "${C_RESET}"
     read -r input
     
     # Clean input: remove ANY carriage returns or non-printable chars
@@ -165,5 +165,5 @@ ui_input() {
 
     # Visual feedback
     printf "\033[1A\r\033[K"
-    printf "${C_GREEN}✔${C_RESET} ${C_BOLD}%s${C_RESET} ${C_CYAN}%s${C_RESET}\n" "$prompt" "$UI_INPUT_RESULT"
+    printf "%b %b%s%b %b%s%b\n" "${C_GREEN}✔${C_RESET}" "${C_BOLD}" "$prompt" "${C_RESET}" "${C_CYAN}" "$UI_INPUT_RESULT" "${C_RESET}"
 }
