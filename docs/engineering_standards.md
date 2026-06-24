@@ -135,3 +135,44 @@ log() { local m; m="[$(date +'%H:%M:%S')] $*"; echo "$m"; }
 ```
 
 **Why we do this**: It guarantees that silent failures don't creep into our automation, respecting our strict "Fail Fast" policy.
+
+---
+
+### [SC2034] Variable appears unused. Verify use (or export if used externally)
+
+**Severity**: Low (Code Quality / Clean Code)
+**Context**: Occurs when you declare a variable but never read its value.
+
+#### ❌ The Problem (Anti-Pattern)
+Leaving unused variables in the code creates confusion for future developers and wastes memory. ShellCheck flags this to enforce clean code. We face this in two specific scenarios: loop iterators and global return variables.
+
+```bash
+# BAD: We declare 'i' but never use it inside the loop.
+for i in {1..60}; do
+    echo "Waiting..."
+done
+
+# BAD: A global variable acting as a function return value, 
+# which is read in other scripts but appears unused locally.
+UI_SELECT_RESULT="my_value"
+```
+
+#### ✅ The Solution (Enterprise Standard)
+Depending on the scenario, we apply two different standards:
+
+1. **For unused loop variables**: Use an underscore (`_`), which is the universal standard for "intentionally ignored variable".
+```bash
+# GOOD: The underscore clearly communicates the intent.
+for _ in {1..60}; do
+    echo "Waiting..."
+done
+```
+
+2. **For global return variables**: Use a specific ShellCheck disable directive to tell the linter that this is intentional.
+```bash
+# GOOD: We explicitly document that this variable is used externally.
+# shellcheck disable=SC2034
+UI_SELECT_RESULT="my_value"
+```
+
+**Why we do this**: It keeps our codebase perfectly clean, avoids "dead code", and documents our architectural decisions regarding function return values.

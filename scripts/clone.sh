@@ -128,7 +128,7 @@ VBoxManage startvm "$VM_NAME" --type headless
 
 # Wait for SSH to be ready
 log "Waiting for SSH to be ready on port $AVAILABLE_PORT..."
-for i in {1..60}; do
+for _ in {1..60}; do
     if ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -p "$AVAILABLE_PORT" "${ADMIN_USER}@127.0.0.1" exit 2>/dev/null; then
         break
     fi

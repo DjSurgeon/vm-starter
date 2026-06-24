@@ -127,6 +127,7 @@ ui_select() {
             # Clean up and return
             printf "\033[%dA\r\033[K" $((num_options + 1))
             printf "%b %b%s%b %b%s%b\n" "${C_GREEN}✔${C_RESET}" "${C_BOLD}" "$prompt" "${C_RESET}" "${C_CYAN}" "${options[$current_idx]}" "${C_RESET}"
+            # shellcheck disable=SC2034
             UI_SELECT_RESULT=$current_idx
             printf "\033[?25h" # Show cursor
             return 0
@@ -158,8 +159,10 @@ ui_input() {
     input=$(echo "$input" | tr -d '\r\n')
 
     if [ -z "$input" ]; then
+        # shellcheck disable=SC2034
         UI_INPUT_RESULT="$default"
     else
+        # shellcheck disable=SC2034
         UI_INPUT_RESULT="$input"
     fi
 

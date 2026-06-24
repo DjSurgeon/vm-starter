@@ -38,10 +38,10 @@ fi
 # -----------------------------------------------------------------------------
 # 4. Summary & Confirmation
 # -----------------------------------------------------------------------------
-printf "\n${C_CYAN}=== Configuration Summary ===${C_RESET}\n"
-printf "  ${C_BOLD}Project Name:${C_RESET} %s\n" "$PROJECT_NAME"
-printf "  ${C_BOLD}Project Type:${C_RESET} %s\n" "$PROJECT_TYPE"
-printf "  ${C_BOLD}Template:${C_RESET}     %s\n" "$TEMPLATE_NAME"
+printf "\n%b\n" "${C_CYAN}=== Configuration Summary ===${C_RESET}"
+printf "  %bProject Name:%b %s\n" "${C_BOLD}" "${C_RESET}" "$PROJECT_NAME"
+printf "  %bProject Type:%b %s\n" "${C_BOLD}" "${C_RESET}" "$PROJECT_TYPE"
+printf "  %bTemplate:%b     %s\n" "${C_BOLD}" "${C_RESET}" "$TEMPLATE_NAME"
 printf "%b\n\n" "${C_CYAN}=============================${C_RESET}"
 
 CONFIRM_OPTIONS=("Yes, create it!" "No, start over" "Cancel")
