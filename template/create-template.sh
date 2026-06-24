@@ -13,6 +13,7 @@ source "${SCRIPT_DIR}/../config/config.sh" || { echo "❌ Error: Could not load 
 
 # 2. Source modular libraries
 for lib in "${SCRIPT_DIR}/lib/"*.sh; do
+    # shellcheck disable=SC1090
     source "$lib"
 done
 

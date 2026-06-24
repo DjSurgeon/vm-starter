@@ -176,3 +176,100 @@ UI_SELECT_RESULT="my_value"
 ```
 
 **Why we do this**: It keeps our codebase perfectly clean, avoids "dead code", and documents our architectural decisions regarding function return values.
+
+---
+
+### [SC2086] Double quote to prevent globbing and word splitting
+
+**Severity**: Critical (Security / Stability)
+**Context**: Occurs when you use a variable without surrounding it in double quotes, particularly when passing it as an argument to a command.
+
+#### ❌ The Problem (Anti-Pattern)
+If a variable is not quoted, Bash performs two dangerous operations before passing it to the command:
+1. **Word Splitting**: It splits the string by spaces. If `PASSWORD="My Secret"`, a command like `openssl passwd $PASSWORD` will receive two arguments (`My` and `Secret`), breaking the command.
+2. **Globbing**: It expands wildcard characters (`*`, `?`). If `PASSWORD="Secret*"`, Bash will look for all files starting with "Secret" in the current directory and pass them to the command!
+
+```bash
+# BAD: Vulnerable to spaces and wildcards
+openssl passwd -6 ${ADMIN_PASSWORD}
+
+# BAD: Subshells need their internal variables quoted too!
+echo "$(openssl passwd -6 ${ADMIN_PASSWORD})"
+```
+
+#### ✅ The Solution (Enterprise Standard)
+Quote absolutely every variable expansion unless you explicitly want Bash to split the string into multiple arguments.
+
+```bash
+# GOOD: Safe against spaces and globbing
+openssl passwd -6 "${ADMIN_PASSWORD}"
+
+# GOOD: It is perfectly valid (and necessary) to use double quotes 
+# inside a subshell that is itself double quoted.
+echo "$(openssl passwd -6 "${ADMIN_PASSWORD}")"
+```
+
+**Why we do this**: It is the most fundamental security rule in Bash scripting. Failing to quote variables leads to arbitrary code execution, corrupted data, and unpredictable crashes.
+
+---
+
+### [SC2115] Use "${var:?}" to ensure this never expands to /
+
+**Severity**: Critical (Catastrophic Data Loss)
+**Context**: Occurs when you use `rm -rf` with variables that construct a path, without validating that the variables are not empty.
+
+#### ❌ The Problem (Anti-Pattern)
+Imagine this command in a deployment script:
+```bash
+rm -rf "${APP_DIR}/${VERSION}"
+```
+If the script is executed in an environment where `$APP_DIR` and `$VERSION` are not defined (e.g., a failed config load, or running a script manually without setting the environment), Bash evaluates empty variables as empty strings.
+
+The command evaluates to:
+```bash
+rm -rf "/"
+```
+This will forcefully recursively delete your entire hard drive, destroying the operating system.
+
+#### ✅ The Solution (Enterprise Standard)
+Bash provides a parameter expansion feature to prevent this: `${variable:?ErrorMessage}`.
+If the variable is unset or null, Bash will immediately print the ErrorMessage (or a default message) and **abort the command**. 
+
+```bash
+# GOOD: If APP_DIR or VERSION is empty, the command aborts before executing rm.
+rm -rf "${APP_DIR:?}/${VERSION:?}"
+
+# BEST: You can even provide custom error messages.
+rm -rf "${APP_DIR:?APP_DIR is not set}/${VERSION:?VERSION is not set}"
+```
+
+**Why we do this**: It is a mandatory safeguard in any script that deletes data. It protects the host machine from catastrophic data loss caused by environment misconfigurations.
+
+---
+
+### [SC1090] ShellCheck can't follow non-constant source
+
+**Severity**: Info (Linter Limitation / Architecture Exception)
+**Context**: Occurs when you `source` a file using a dynamic variable (like in a loop or based on a parameter) rather than a hardcoded string.
+
+#### ❌ The Problem (Linter Limitation)
+ShellCheck performs static analysis. This means it reads your code without executing it. If you have a loop that imports all files in a folder dynamically:
+```bash
+for lib in "${SCRIPT_DIR}/lib/"*.sh; do
+    source "$lib"
+done
+```
+The linter doesn't know which files are going to be matched at runtime, so it cannot open those files to analyze them for errors. It throws SC1090 to warn you that it's skipping the analysis of those imported files.
+
+#### ✅ The Solution (Enterprise Standard)
+Since our architecture deliberately uses dynamic loading for plugins and modules, this is an expected behavior. The standard here is to explicitly tell ShellCheck to ignore this specific line using a disable directive.
+
+```bash
+# GOOD: We explicitly tell the linter that dynamic loading is intentional
+for lib in "${SCRIPT_DIR}/lib/"*.sh; do
+    # shellcheck disable=SC1090
+    source "$lib"
+done
+```
+
+**Why we do this**: It allows us to build scalable, plugin-based architectures while keeping the linter happy and showing that we understand the limits of static analysis.

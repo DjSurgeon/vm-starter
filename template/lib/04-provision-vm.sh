@@ -21,7 +21,7 @@ provision_vm() {
     fi
 
     # Ensure physical directory is gone
-    rm -rf "${DISK_IMAGES_DIR}/${TEMPLATE_NAME}"
+    rm -rf "${DISK_IMAGES_DIR:?}/${TEMPLATE_NAME:?}"
     mkdir -p "${DISK_IMAGES_DIR}/${TEMPLATE_NAME}"
 
     log "Creating VirtualBox VM '${TEMPLATE_NAME}' (${TEMPLATE_OSTYPE})..."

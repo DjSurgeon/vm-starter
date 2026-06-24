@@ -40,7 +40,7 @@ autoinstall:
   
   identity:
     hostname: ${TEMPLATE_HOSTNAME}
-    password: "$(openssl passwd -6 ${ADMIN_PASSWORD})"
+    password: "$(openssl passwd -6 "${ADMIN_PASSWORD}")"
     username: ${ADMIN_USER}
   
   ssh:
