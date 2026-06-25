@@ -66,16 +66,7 @@ VBoxManage modifyvm "$VM_NAME" --memory "$RAM" --cpus "$CPU"
 # -----------------------------------------------------------------------------
 log "Finding an available host port for SSH..."
 
-# Get all used ports from VirtualBox NAT forwarding rules
-USED_PORTS=$(VBoxManage list vms | awk '{print $1}' | tr -d '"' | xargs -I {} VBoxManage showvminfo {} --machinereadable 2>/dev/null | grep "Forwarding" | cut -d, -f4 | sort -n | uniq)
-
-AVAILABLE_PORT=""
-for port in $(seq "$SSH_PORT_RANGE_START" "$SSH_PORT_RANGE_END"); do
-    if ! echo "$USED_PORTS" | grep -q "^${port}$"; then
-        AVAILABLE_PORT="$port"
-        break
-    fi
-done
+AVAILABLE_PORT=$(get_available_ssh_port "$SSH_PORT_RANGE_START" "$SSH_PORT_RANGE_END") || true
 
 if [ -z "$AVAILABLE_PORT" ]; then
     error "No available ports found in range ${SSH_PORT_RANGE_START}-${SSH_PORT_RANGE_END}."

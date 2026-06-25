@@ -170,3 +170,25 @@ ui_input() {
     printf "\033[1A\r\033[K"
     printf "%b %b%s%b %b%s%b\n" "${C_GREEN}✔${C_RESET}" "${C_BOLD}" "$prompt" "${C_RESET}" "${C_CYAN}" "$UI_INPUT_RESULT" "${C_RESET}"
 }
+
+# -----------------------------------------------------------------------------
+# 8. Network Operations
+# -----------------------------------------------------------------------------
+# Usage: get_available_ssh_port <start_port> <end_port>
+# Returns: Echoes the available port or returns 1 if none
+get_available_ssh_port() {
+    local start_port="$1"
+    local end_port="$2"
+    local used_ports
+    
+    # Extract all currently forwarded guestssh ports
+    used_ports=$(VBoxManage list vms | awk '{print $1}' | tr -d '"' | xargs -I {} VBoxManage showvminfo {} --machinereadable 2>/dev/null | grep "Forwarding" | grep "guestssh" | cut -d, -f4 | sort -n | uniq)
+    
+    for port in $(seq "$start_port" "$end_port"); do
+        if ! echo "$used_ports" | grep -q "^${port}$"; then
+            echo "$port"
+            return 0
+        fi
+    done
+    return 1
+}

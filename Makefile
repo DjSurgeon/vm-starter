@@ -7,37 +7,30 @@ include mk/config.mk
 include mk/vm-ops.mk
 include mk/setup.mk
 include mk/system.mk
+include mk/test.mk
 
 # 2. Default target
 .DEFAULT_GOAL := help
 
-# 3. Help target
-help:
-	@printf "$(C_BOLD)VM-Starter – Development VM Manager$(C_RESET)\n\n"
-	@printf "Usage:\n"
-	@printf "  $(C_GREEN)make init$(C_RESET)           Configure storage path (Opcional, useful for 42 Campus)\n"
-	@printf "  $(C_GREEN)make create$(C_RESET)         Launch the interactive wizard to clone a new project\n"
-	@printf "  $(C_GREEN)make info$(C_RESET)           Show visual dashboard (Disk, VMs, Ports)\n"
-	@printf "  $(C_GREEN)make template$(C_RESET)        Create the base template ($(C_CYAN)$(TEMPLATE_NAME)$(C_RESET))\n"
-	@printf "  $(C_GREEN)make project$(C_RESET)         Create a new project (interactive)\n"
-	@printf "  $(C_GREEN)make project NAME=n TYPE=t$(C_RESET)   Create project with given name and type (web|inception)\n"
-	@printf "  $(C_GREEN)make list$(C_RESET)            List all VirtualBox VMs\n"
-	@printf "  $(C_GREEN)make start NAME=v$(C_RESET)    Start a VM by name\n"
-	@printf "  $(C_GREEN)make stop NAME=v$(C_RESET)     Power off a VM by name\n"
-	@printf "  $(C_GREEN)make rm NAME=v$(C_RESET)       Delete a VM completely and clean its SSH alias\n"
-	@printf "  $(C_GREEN)make ssh NAME=v$(C_RESET)      Connect to a VM via SSH (alias from ~/.ssh/config)\n"
-	@printf "  $(C_GREEN)make status$(C_RESET)          Show status of template and projects\n"
-	@printf "  $(C_GREEN)make check$(C_RESET)           Check system dependencies and configuration\n"
-	@printf "  $(C_GREEN)make deps$(C_RESET)            Install required packages (VirtualBox, genisoimage, etc.)\n"
-	@printf "  $(C_GREEN)make clean$(C_RESET)           Remove ISOs and seed files (keep VMs)\n"
-	@printf "  $(C_GREEN)make fclean$(C_RESET)          Remove everything (VMs, ISOs, seeds) – use with care!\n"
-	@printf "  $(C_GREEN)make re$(C_RESET)              Full rebuild (fclean + template)\n\n"
+##@ General
 
-# 4. Interactive targets
-init:
+.PHONY: help
+help: ## Muestra este menú de ayuda
+	@printf "$(C_BOLD)VM-Starter – Development VM Manager$(C_RESET)\n\n"
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(C_CYAN)<target>$(C_RESET)\n"} \
+		/^[a-zA-Z_-]+:.*?##/ { printf "  $(C_CYAN)%-15s$(C_RESET) %s\n", $$1, $$2 } \
+		/^##@/ { printf "\n$(C_BOLD)%s$(C_RESET)\n", substr($$0, 5) } \
+		' $(MAKEFILE_LIST)
+	@echo ""
+
+##@ Interactive Setup
+
+.PHONY: init
+init: ## Configura la ruta de almacenamiento (Opcional, útil para 42 Campus)
 	@chmod +x scripts/init-env.sh
 	@./scripts/init-env.sh
 
-create:
+.PHONY: create
+create: ## Lanza el asistente interactivo para clonar un nuevo proyecto
 	@chmod +x scripts/wizard.sh
 	@./scripts/wizard.sh
