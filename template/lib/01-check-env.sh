@@ -20,6 +20,10 @@ check_env() {
     check_command curl "curl"
     check_command wget "wget"
 
+    log "Validating hardware specifications..."
+    validate_numeric "TEMPLATE_RAM_MB" "${TEMPLATE_RAM_MB}"
+    validate_numeric "TEMPLATE_CPU" "${TEMPLATE_CPU}"
+
     # Ensure host SSH key exists to inject into VM
     HOST_PUB_KEY=""
     for key in ~/.ssh/id_ed25519.pub ~/.ssh/id_rsa.pub; do

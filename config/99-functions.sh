@@ -55,6 +55,15 @@ check_command() {
 }
 
 # -----------------------------------------------------------------------------
+validate_numeric() {
+    local var_name="$1"
+    local var_value="$2"
+    if [[ ! "$var_value" =~ ^[0-9]+$ ]]; then
+        error "Validation Error: ${var_name} must be a strictly numeric value (got: '${var_value}'). Do not use suffixes like 'GB' or 'MB'."
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # 4. Configuration Summary
 # -----------------------------------------------------------------------------
 show_config() {
