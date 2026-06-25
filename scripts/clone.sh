@@ -13,12 +13,16 @@ source "${PROJECT_ROOT}/config/config.sh" || { echo "❌ Error: Could not load c
 # -----------------------------------------------------------------------------
 # 2. Input Validation
 # -----------------------------------------------------------------------------
+check_not_root
+
 PROJECT_NAME="$1"
 PROJECT_TYPE="$2"
 
 if [ -z "$PROJECT_NAME" ] || [ -z "$PROJECT_TYPE" ]; then
     error "Usage: $0 <name> <type (web|inception)>"
 fi
+
+validate_project_name "$PROJECT_NAME"
 
 if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" ]]; then
     error "Invalid project type: $PROJECT_TYPE. Must be 'web' or 'inception'."

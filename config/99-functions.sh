@@ -232,3 +232,20 @@ Host ${vm_name}
 
     printf "%s" "$entry" >> "$ssh_config_file"
 }
+
+# -----------------------------------------------------------------------------
+# 10. Security Validation
+# -----------------------------------------------------------------------------
+validate_project_name() {
+    local name="$1"
+    if [[ ! "$name" =~ ^[a-zA-Z0-9-]+$ ]]; then
+        error "Invalid project name '$name'. Only alphanumeric characters and hyphens are allowed."
+    fi
+}
+
+check_not_root() {
+    local current_euid=${MOCK_EUID:-$EUID}
+    if [ "$current_euid" -eq 0 ]; then
+        error "This script should not be run as root (or with sudo). VirtualBox VMs must belong to your standard user."
+    fi
+}
