@@ -71,6 +71,15 @@ make deps
    ```
    *Start coding! Your VM is ready with Docker, Node.js (if web type), and the project directory.*
 
+## 🌐 DevOps Ecosystem & Reference Architecture
+
+**VM-Starter** acts as the foundational Infrastructure-as-Code (IaC) layer. It is explicitly designed to integrate seamlessly with microservices and containerized environments. 
+
+You can explore how automated Docker container deployments, artifact registries, and advanced CI/CD pipelines are orchestrated on top of this very infrastructure in my sister repository:
+👉 [**Inception - Docker Orchestration Architecture**](https://github.com/DjSurgeon/cursus/tree/main/cursus/inception/intra)
+
+*This dual-repository setup demonstrates a complete End-to-End lifecycle understanding, from bare-metal VM provisioning to application-level container orchestration.*
+
 ## 📚 Documentation
 
 Dive deeper into how VM-Starter works:
