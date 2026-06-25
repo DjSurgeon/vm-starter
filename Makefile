@@ -15,7 +15,7 @@ include mk/test.mk
 ##@ General
 
 .PHONY: help
-help: ## Muestra este menú de ayuda
+help: ## Shows this help menu
 	@printf "$(C_BOLD)VM-Starter – Development VM Manager$(C_RESET)\n\n"
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(C_CYAN)<target>$(C_RESET)\n"} \
 		/^[a-zA-Z_-]+:.*?##/ { printf "  $(C_CYAN)%-15s$(C_RESET) %s\n", $$1, $$2 } \
@@ -26,11 +26,11 @@ help: ## Muestra este menú de ayuda
 ##@ Interactive Setup
 
 .PHONY: init
-init: ## Configura la ruta de almacenamiento (Opcional, útil para 42 Campus)
+init: ## Configures the storage path (Optional, useful for 42 Campus)
 	@chmod +x scripts/init-env.sh
 	@./scripts/init-env.sh
 
 .PHONY: create
-create: ## Lanza el asistente interactivo para clonar un nuevo proyecto
+create: ## Launches the interactive wizard to clone a new project
 	@chmod +x scripts/wizard.sh
 	@./scripts/wizard.sh

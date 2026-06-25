@@ -1,11 +1,11 @@
 #!/usr/bin/env bats
 
 # =============================================================================
-# tests/test_security.bats – Validaciones de seguridad
+# tests/test_security.bats – Security validation tests
 # =============================================================================
 
 load setup
 
-@test "Placeholder: Los tests de seguridad se implementarán en la Fase 2" {
-    skip "Pendiente de implementación en Fase 2"
+@test "Placeholder: Security tests will be implemented in a future phase" {
+    skip "Pending implementation"
 }

@@ -6,7 +6,7 @@
 
 .PHONY: check deps clean vclean fclean
 
-check: ## Comprueba las dependencias del sistema (VirtualBox, genisoimage, etc.)
+check: ## Checks system dependencies (VirtualBox, genisoimage, etc.)
 	@printf "$(C_CYAN)▶ Checking system dependencies...$(C_RESET)\n"
 	@errors=0; \
 	if ! command -v VBoxManage >/dev/null 2>&1; then \
@@ -25,7 +25,7 @@ check: ## Comprueba las dependencias del sistema (VirtualBox, genisoimage, etc.)
 		printf "$(C_RED)✗ Some dependencies are missing. Please fix them.$(C_RESET)\n"; exit 1; \
 	else printf "$(C_GREEN)✓ All checks passed.$(C_RESET)\n"; fi
 
-deps: ## Instala los paquetes necesarios en el host
+deps: ## Installs required packages on the host
 	@printf "$(C_CYAN)▶ Installing dependencies...$(C_RESET)\n"
 	@if command -v apt-get >/dev/null 2>&1; then \
 		sudo apt-get update -qq; \
@@ -42,7 +42,7 @@ deps: ## Instala los paquetes necesarios en el host
 	fi
 	@printf "$(C_GREEN)✓ Dependencies installed.$(C_RESET)\n"
 
-clean: ## Elimina archivos temporales e ISOs semilla (mantiene las VMs)
+clean: ## Removes temporary seed files and ISOs (keeps VMs)
 	@printf "$(C_YELLOW)▶ Removing temporary seed files and configs...$(C_RESET)\n"
 	@rm -f /tmp/seed-*.iso "$(ISO_DIR)"/seed-*.iso
 	@rm -rf cloud-init/user-data cloud-init/meta-data
@@ -50,7 +50,7 @@ clean: ## Elimina archivos temporales e ISOs semilla (mantiene las VMs)
 	@rm -rf iso/ disk_images/
 	@printf "$(C_GREEN)✓ Clean done.$(C_RESET)\n"
 
-vclean: clean ## Elimina VMs del proyecto (mantiene la ISO base)
+vclean: clean ## Removes project VMs (keeps base ISO)
 	@printf "$(C_YELLOW)▶ Forgetting inaccessible VMs...$(C_RESET)\n"
 	@VBoxManage list vms | grep '"<inaccessible>"' | awk '{print $$2}' | tr -d '{}' | while read uuid; do \
 		VBoxManage unregistervm "$$uuid" 2>/dev/null || true; \
@@ -68,7 +68,7 @@ vclean: clean ## Elimina VMs del proyecto (mantiene la ISO base)
 	@printf "$(C_YELLOW)▶ Cleaning SSH aliases for VM-Starter VMs...$(C_RESET)\n"
 	@perl -0777 -pi -e 's/\nHost (web-|inception-).*?(?=\nHost |\z)//gs' ~/.ssh/config 2>/dev/null || true
 
-fclean: ## Borra todo completamente (VMs, ISOs, seeds). ¡Peligroso!
+fclean: ## Completely removes everything (VMs, ISOs, seeds). Dangerous!
 	@printf "$(C_RED)⚠ WARNING: This will delete ALL VM-Starter VMs and binary files.$(C_RESET)\n"
 	@read -p "Are you sure? (y/N) " REPLY; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \

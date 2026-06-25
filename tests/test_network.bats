@@ -6,15 +6,15 @@
 
 load setup
 
-@test "Network: Debería asignar el primer puerto (2222) si está libre" {
-    # Mock de VBoxManage para que no devuelva ninguna VM ni puerto usado
+@test "Network: Should allocate the first port (2222) if available" {
+    # Mock VBoxManage to return no VMs or used ports
     cat << 'EOF' > "${MOCK_BIN_DIR}/VBoxManage"
 #!/bin/bash
 exit 0
 EOF
     chmod +x "${MOCK_BIN_DIR}/VBoxManage"
 
-    # Cargamos la función a testear
+    # Load the function to test
     source "${PROJECT_ROOT}/config/99-functions.sh"
 
     run get_available_ssh_port 2222 2299
@@ -23,8 +23,8 @@ EOF
     [ "$output" -eq 2222 ]
 }
 
-@test "Network: Debería saltar al 2223 si el 2222 está ocupado" {
-    # Mock de VBoxManage para simular que el 2222 está ocupado
+@test "Network: Should jump to 2223 if 2222 is busy" {
+    # Mock VBoxManage to simulate that 2222 is occupied
     cat << 'EOF' > "${MOCK_BIN_DIR}/VBoxManage"
 #!/bin/bash
 if [ "$1" = "list" ]; then
@@ -46,7 +46,7 @@ EOF
     [ "$output" -eq 2223 ]
 }
 
-@test "Network: Debería fallar (return 1) si todos los puertos están ocupados" {
+@test "Network: Should fail (return 1) if all ports are busy" {
     cat << 'EOF' > "${MOCK_BIN_DIR}/VBoxManage"
 #!/bin/bash
 if [ "$1" = "list" ]; then

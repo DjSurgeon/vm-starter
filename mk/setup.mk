@@ -6,12 +6,12 @@
 
 .PHONY: template project re
 
-template: ## Crea la plantilla base (devpod-base)
+template: ## Creates the base template (devpod-base)
 	@printf "$(C_CYAN)▶ Creating base template with user: $(C_BOLD)$${USER_NAME:-$(ADMIN_USER)}$(C_RESET)\n"
 	@chmod +x template/create-template.sh
 	@ADMIN_USER=$${USER_NAME:-$(ADMIN_USER)} ./template/create-template.sh
 
-project: ## Crea un nuevo proyecto (uso: make project NAME=foo TYPE=web)
+project: ## Creates a new project (usage: make project NAME=foo TYPE=web)
 	@chmod +x scripts/clone.sh 2>/dev/null || true
 	@if [ -z "$${NAME:-}" ] || [ -z "$${TYPE:-}" ]; then \
 		read -p "Project name: " PROJECT_NAME; \
@@ -21,5 +21,5 @@ project: ## Crea un nuevo proyecto (uso: make project NAME=foo TYPE=web)
 		./scripts/clone.sh "$(NAME)" "$(TYPE)"; \
 	fi
 
-re: vclean template ## Limpia el entorno y reconstruye la plantilla base
+re: vclean template ## Cleans the environment and rebuilds the base template
 	@printf "$(C_GREEN)✓ Rebuild complete.$(C_RESET)\n"

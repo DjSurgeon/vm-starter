@@ -6,10 +6,10 @@
 
 .PHONY: list start stop ssh status info rm
 
-list: ## Lista todas las máquinas virtuales (VirtualBox)
+list: ## Lists all VirtualBox VMs
 	@VBoxManage list vms | column -t
 
-info: ## Muestra un panel visual con estado de disco, VMs y puertos
+info: ## Shows a visual dashboard with disk, VMs, and ports status
 	@printf "$(C_CYAN)╔════════════════════════════════════════════════════════════════╗$(C_RESET)\n"
 	@printf "$(C_CYAN)║$(C_RESET) $(C_BOLD)VM-Starter Dashboard$(C_RESET)                                         $(C_CYAN)║$(C_RESET)\n"
 	@printf "$(C_CYAN)╠════════════════════════════════════════════════════════════════╣$(C_RESET)\n"
@@ -38,14 +38,14 @@ info: ## Muestra un panel visual con estado de disco, VMs y puertos
 	fi
 	@printf "$(C_CYAN)╚════════════════════════════════════════════════════════════════╝$(C_RESET)\n"
 
-start: ## Enciende una VM por su nombre (make start NAME=foo)
+start: ## Starts a VM by name (make start NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make start NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
 	@VBoxManage startvm "$(NAME)" --type headless
 	@printf "$(C_GREEN)✓ VM '$(NAME)' started.$(C_RESET)\n"
 
-stop: ## Apaga una VM de forma segura (make stop NAME=foo)
+stop: ## Safely powers off a VM (make stop NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make stop NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
@@ -53,7 +53,7 @@ stop: ## Apaga una VM de forma segura (make stop NAME=foo)
 	 VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || \
 	 printf "$(C_YELLOW)⚠ VM '$(NAME)' is not running.$(C_RESET)\n"
 
-rm: ## Elimina completamente una VM y limpia su alias SSH (make rm NAME=foo)
+rm: ## Completely removes a VM and cleans its SSH alias (make rm NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make rm NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
@@ -70,7 +70,7 @@ rm: ## Elimina completamente una VM y limpia su alias SSH (make rm NAME=foo)
 	@awk -v host="Host $(NAME)" '$$0 == host { skip=1; next } skip && /^Host / { skip=0 } !skip { print }' ~/.ssh/config > ~/.ssh/config.tmp && mv ~/.ssh/config.tmp ~/.ssh/config 2>/dev/null || true
 	@printf "$(C_GREEN)✓ VM '$(NAME)' deleted.$(C_RESET)\n"
 
-ssh: ## Conecta por SSH a una VM (make ssh NAME=foo)
+ssh: ## Connects to a VM via SSH (make ssh NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make ssh NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
@@ -84,7 +84,7 @@ ssh: ## Conecta por SSH a una VM (make ssh NAME=foo)
 		ssh $(NAME); \
 	fi
 
-status: ## Muestra el estado detallado de la plantilla y proyectos
+status: ## Shows detailed status of the template and projects
 	@printf "$(C_CYAN)=== VM-Starter Status ===$(C_RESET)\n"
 	@printf "$(C_BOLD)Template:$(C_RESET)\n"
 	@if VBoxManage showvminfo "$(TEMPLATE_NAME)" >/dev/null 2>&1; then \
