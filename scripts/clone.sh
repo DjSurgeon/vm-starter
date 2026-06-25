@@ -83,33 +83,7 @@ VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,,$AVAILABLE_PORT,,$SSH_VM_
 # 7. SSH Config Update
 # -----------------------------------------------------------------------------
 log "Updating ~/.ssh/config for alias '$VM_NAME'..."
-
-SSH_CONFIG_ENTRY="
-Host ${VM_NAME}
-    HostName 127.0.0.1
-    User ${ADMIN_USER}
-    Port ${AVAILABLE_PORT}
-    ForwardAgent yes
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-    LogLevel ERROR
-"
-
-# Create .ssh dir if it doesn't exist
-mkdir -p "$HOME/.ssh"
-touch "$HOME/.ssh/config"
-
-# Remove existing entry if it exists to avoid duplicates
-if grep -q "^Host ${VM_NAME}$" "$HOME/.ssh/config"; then
-    warn "Cleaning old entry for 'Host ${VM_NAME}' in ~/.ssh/config."
-    awk -v host="Host ${VM_NAME}" '
-        $0 == host { skip=1; next }
-        skip && /^Host / { skip=0 }
-        !skip { print }
-    ' "$HOME/.ssh/config" > "$HOME/.ssh/config.tmp" && mv "$HOME/.ssh/config.tmp" "$HOME/.ssh/config"
-fi
-
-printf "%s" "$SSH_CONFIG_ENTRY" >> "$HOME/.ssh/config"
+update_ssh_config "$VM_NAME" "$ADMIN_USER" "$AVAILABLE_PORT"
 
 # -----------------------------------------------------------------------------
 # 8. Project Provisioning

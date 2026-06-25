@@ -192,3 +192,43 @@ get_available_ssh_port() {
     done
     return 1
 }
+
+# -----------------------------------------------------------------------------
+# 9. Security & Config Management
+# -----------------------------------------------------------------------------
+# Usage: update_ssh_config <vm_name> <admin_user> <port> [config_file_path]
+# Safely adds or replaces an SSH config entry to prevent duplicates and ensure
+# correct StrictHostKeyChecking bypass for local VMs.
+update_ssh_config() {
+    local vm_name="$1"
+    local admin_user="$2"
+    local port="$3"
+    # Allow overriding the path for testing
+    local ssh_config_file="${4:-$HOME/.ssh/config}"
+
+    local entry="
+Host ${vm_name}
+    HostName 127.0.0.1
+    User ${admin_user}
+    Port ${port}
+    ForwardAgent yes
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
+"
+
+    # Create dir and file if they don't exist
+    mkdir -p "$(dirname "$ssh_config_file")"
+    touch "$ssh_config_file"
+
+    # Remove existing entry if it exists to avoid duplicates
+    if grep -q "^Host ${vm_name}$" "$ssh_config_file"; then
+        awk -v host="Host ${vm_name}" '
+            $0 == host { skip=1; next }
+            skip && /^Host / { skip=0 }
+            !skip { print }
+        ' "$ssh_config_file" > "${ssh_config_file}.tmp" && mv "${ssh_config_file}.tmp" "$ssh_config_file"
+    fi
+
+    printf "%s" "$entry" >> "$ssh_config_file"
+}
