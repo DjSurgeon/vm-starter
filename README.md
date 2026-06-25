@@ -1,5 +1,6 @@
 # VM-Starter 🚀
 
+[![CI Pipeline - Validation & Testing](https://github.com/DjSurgeon/vm-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/DjSurgeon/vm-starter/actions/workflows/ci.yml)
 [![Bash](https://img.shields.io/badge/Language-Bash-4EAA25?logo=gnu-bash&logoColor=white)](#)
 [![VirtualBox](https://img.shields.io/badge/Virtualization-VirtualBox-183A61?logo=virtualbox&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey)](#)
@@ -7,7 +8,7 @@
 
 > Create disposable, reproducible development environments in minutes without losing your storage limits.
 
-**VM-Starter** is a lightweight Infrastructure-as-Code (IaC) tool built purely with Bash and VirtualBox. It automates the creation of **Ubuntu 24.04 LTS** based virtual machines tailored for different development workflows. 
+**VM-Starter** is a lightweight Infrastructure-as-Code (IaC) tool built purely with Bash and VirtualBox. It automates the creation of **Ubuntu 24.04 LTS** based virtual machines tailored for different development workflows. The repository employs professional DevOps practices including **Static Application Security Testing (SAST) via ShellCheck** and **Automated Integration Testing & Mocking via Bats-core**.
 
 ## 🎯 Why this project?
 

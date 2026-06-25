@@ -10,12 +10,13 @@ If you find a bug, please create an issue using the `Bug Report` template. Inclu
 ### 2. Suggest Enhancements
 If you have an idea to improve `vm-starter`, create an issue using the `Feature Request` template.
 
-### 3. Pull Requests
-1. Fork the repo and create your branch from `main`.
-2. If you've added code that should be tested, add tests or describe how to test it.
-3. Ensure your code follows the existing style (Shellcheck for bash scripts). **Please read our [Engineering Standards](docs/engineering_standards.md) before submitting code.**
+### 3. Pull Requests & Development Workflow
+We follow a **Trunk-Based Development** strategy. 
+1. Create short-lived feature branches directly from `main`.
+2. Ensure your code follows the existing style (Shellcheck for bash scripts). **Please read our [Engineering Standards](docs/engineering_standards.md) before submitting code.**
+3. **Crucial:** Run the testing suite locally using `make test`. Your branch must pass all unit and integration tests.
 4. Update the documentation (`README.md`, `USER_DOC.md`, or `DEV_DOC.md`) if necessary.
-5. Create a Pull Request using the provided template.
+5. Create a Pull Request targeting `main` using the provided template.
 
 ## Testing Changes
 To test your changes locally, we recommend running:

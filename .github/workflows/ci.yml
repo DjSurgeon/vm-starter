@@ -1,4 +1,4 @@
-name: CI Pipeline - Bash Static Analysis
+name: CI Pipeline - Validation & Testing
 
 on:
   push:
@@ -8,14 +8,20 @@ on:
 
 jobs:
   shellcheck:
-    name: ShellCheck Linter
+    name: Code Quality & Testing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Run ShellCheck
+      - name: Install Bats-core
+        run: sudo apt-get update && sudo apt-get install -y bats
+
+      - name: Run ShellCheck (SAST)
         uses: ludeeus/action-shellcheck@master
         with:
           # We check all .sh files in the repository
           scandir: '.'
+
+      - name: Run Integration Tests
+        run: make test
