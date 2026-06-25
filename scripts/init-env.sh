@@ -18,7 +18,10 @@ C_GREEN='\033[1;32m'
 C_BLUE='\033[1;34m'
 C_YELLOW='\033[1;33m'
 
-clear
+# Only clear the screen if running in a true interactive terminal
+if [ -t 1 ]; then
+    clear
+fi
 printf "%b\n" "${C_CYAN}${C_BOLD}🚀 VM-Starter Initial Setup${C_RESET}"
 printf "%b\n" "${C_BLUE}Let's configure where VM-Starter stores your VMs and ISOs.${C_RESET}"
 printf "%b\n\n" "${C_YELLOW}This is especially useful for 42 Campus (to use /goinfre or /sgoinfre).${C_RESET}"

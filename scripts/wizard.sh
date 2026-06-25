@@ -14,7 +14,10 @@ source "${PROJECT_ROOT}/config/config.sh"
 # -----------------------------------------------------------------------------
 # 1. Welcome Message
 # -----------------------------------------------------------------------------
-clear
+# Only clear the screen if running in a true interactive terminal
+if [ -t 1 ]; then
+    clear
+fi
 printf "%b\n" "${C_CYAN}${C_BOLD}🚀 VM-Starter Interactive Wizard${C_RESET}"
 printf "%b\n\n" "${C_BLUE}Let's create a new project environment.${C_RESET}"
 

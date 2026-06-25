@@ -13,13 +13,13 @@ teardown() {
 @test "Security: Destructive command must abort if path variables are empty (SC1115)" {
     # Simulating business logic of vm-starter cleanup inside a function to avoid bash -c parsing issues
     simulate_cleanup() {
-        rm -rf "${APP_DIR:?APP_DIR no está seteado}/${VERSION:?VERSION no está seteado}"
+        rm -rf "${APP_DIR:?APP_DIR is not set}/${VERSION:?VERSION is not set}"
     }
     
     run simulate_cleanup
     
     [ "$status" -ne 0 ]
-    [[ "$output" == *"APP_DIR no está seteado"* ]]
+    [[ "$output" == *"APP_DIR is not set"* ]]
 }
 
 @test "Security: Must allow deletion if variables are valid and safe" {
