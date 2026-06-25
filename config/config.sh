@@ -6,7 +6,7 @@
 # Usage: source config/config.sh
 # =============================================================================
 
-CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="${MOCK_CONFIG_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 
 # Enable debug output (set to true to see which files are loaded)
 DEBUG_LOAD=${DEBUG_LOAD:-false}

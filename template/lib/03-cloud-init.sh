@@ -10,9 +10,9 @@ generate_cloud_init() {
     # 3. Build Seed ISO
     # For Ubuntu it needs to be labeled 'cidata'
     export SEED_ISO="${ISO_DIR}/seed-${TEMPLATE_NAME}.iso"
-    log "Building seed ISO with genisoimage..."
+    log "Building seed ISO with ${ISO_CMD}..."
     
-    genisoimage -output "${SEED_ISO}" -volid cidata -joliet -rock -r \
+    ${ISO_CMD} -output "${SEED_ISO}" -volid cidata -joliet -rock -r \
         "${CLOUD_INIT_DIR}/user-data" "${CLOUD_INIT_DIR}/meta-data" >/dev/null 2>&1
 }
 

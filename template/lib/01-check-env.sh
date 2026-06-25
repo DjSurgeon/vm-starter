@@ -9,7 +9,14 @@ check_env() {
     log "Checking required tools..."
     
     check_command VBoxManage "virtualbox"
-    check_command genisoimage "genisoimage"
+    
+    if command -v genisoimage >/dev/null 2>&1; then
+        export ISO_CMD="genisoimage"
+    elif command -v mkisofs >/dev/null 2>&1; then
+        export ISO_CMD="mkisofs"
+    else
+        error "Command 'genisoimage' or 'mkisofs' not found. Please install one and try again."
+    fi
     check_command curl "curl"
     check_command wget "wget"
 
