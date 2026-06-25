@@ -50,6 +50,11 @@ read -r -p "What username do you want for the VM? [$USER]: " VM_USERNAME
 VM_USERNAME=${VM_USERNAME:-$USER}
 VM_USERNAME=$(echo "$VM_USERNAME" | tr -d '\r')
 
+# Update VirtualBox global machine folder
+if command -v VBoxManage >/dev/null 2>&1; then
+    VBoxManage setproperty machinefolder "$CUSTOM_PATH"
+fi
+
 # Write to local_env.sh
 LOCAL_ENV="${PROJECT_ROOT}/config/local_env.sh"
 cat <<EOF > "$LOCAL_ENV"

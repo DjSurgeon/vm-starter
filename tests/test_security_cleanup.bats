@@ -39,6 +39,7 @@ teardown() {
     source "${PROJECT_ROOT}/config/99-functions.sh"
     
     # We mock 'error' function to just exit 1 to test validation without killing bats prematurely
+    # shellcheck disable=SC2317
     error() { echo "$1"; exit 1; }
     export -f error
     
@@ -56,6 +57,7 @@ teardown() {
 @test "Security: check_not_root should abort if running as root" {
     source "${PROJECT_ROOT}/config/99-functions.sh"
     
+    # shellcheck disable=SC2317
     error() { echo "$1"; exit 1; }
     export -f error
     

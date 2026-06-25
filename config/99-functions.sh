@@ -201,7 +201,7 @@ get_available_ssh_port() {
 # correct StrictHostKeyChecking bypass for local VMs.
 update_ssh_config() {
     local vm_name="$1"
-    local admin_user="$2"
+    local ssh_user="$2"
     local port="$3"
     # Allow overriding the path for testing
     local ssh_config_file="${4:-$HOME/.ssh/config}"
@@ -209,7 +209,7 @@ update_ssh_config() {
     local entry="
 Host ${vm_name}
     HostName 127.0.0.1
-    User ${admin_user}
+    User ${ssh_user}
     Port ${port}
     ForwardAgent yes
     StrictHostKeyChecking no

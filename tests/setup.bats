@@ -6,7 +6,8 @@
 
 setup() {
     # Creamos un directorio temporal para simular binarios del sistema (Mocks)
-    export MOCK_BIN_DIR="$(mktemp -d)"
+    MOCK_BIN_DIR="$(mktemp -d)"
+    export MOCK_BIN_DIR
     export PATH="${MOCK_BIN_DIR}:${PATH}"
 }
 

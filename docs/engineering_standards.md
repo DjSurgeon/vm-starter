@@ -294,3 +294,30 @@ source "${PROJECT_ROOT}/config/config.sh"
 ```
 
 **Why we do this**: It optimizes our CI/CD pipeline. Instead of a quadratic ($O(n^2)$) execution time where the linter re-reads the config file for every script that imports it, we achieve a linear ($O(n)$) execution time, saving compute resources and reducing CI costs.
+
+---
+
+### [SC2153] Possible misspelling: VAR may not be assigned
+
+**Severity**: Low (False Positive / Typo detection)
+**Context**: Occurs when you declare a local variable that perfectly matches a global variable but with a different case (e.g., `local admin_user` vs global `ADMIN_USER`).
+
+#### ❌ The Problem (False Positive)
+Because ShellCheck parses scripts statically, when it sees both `admin_user` and `ADMIN_USER` in the same file (or in dynamically sourced files without explicit imports), it assumes you made a typo and meant to use the global variable.
+
+```bash
+# BAD: This triggers SC2153 if ADMIN_USER is used elsewhere in the file.
+local admin_user="$2"
+User ${admin_user}
+```
+
+#### ✅ The Solution (Enterprise Standard)
+Instead of disabling the linter rule using `# shellcheck disable=SC2153`, the most elegant and safe solution is to simply **rename the local variable** so it doesn't phonetically collide with the global variable.
+
+```bash
+# GOOD: Renaming the local variable avoids the warning and makes the code clearer.
+local ssh_user="$2"
+User ${ssh_user}
+```
+
+**Why we do this**: It keeps our linter active to catch real typos in the future, while naturally forcing us to use more specific and descriptive local variable names (e.g., `ssh_user` instead of a generic `admin_user`).
