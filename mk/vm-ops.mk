@@ -43,44 +43,45 @@ start: ## Starts a VM by name (make start NAME=foo)
 		printf "$(C_RED)Error: missing NAME. Use: make start NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
 	@VBoxManage startvm "$(NAME)" --type headless
-	@printf "$(C_GREEN)✓ VM '$(NAME)' started.$(C_RESET)\n"
+	@printf "$(C_GREEN)✓ VM '%s' started.$(C_RESET)\n" "$(NAME)"
 
 stop: ## Safely powers off a VM (make stop NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make stop NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
-	@VBoxManage controlvm "$(NAME)" acpipowerbutton 2>/dev/null || \
-	 VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || \
-	 printf "$(C_YELLOW)⚠ VM '$(NAME)' is not running.$(C_RESET)\n"
+	@if VBoxManage controlvm "$(NAME)" acpipowerbutton 2>/dev/null || VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null; then \
+	 :; \
+	else \
+	 printf "$(C_YELLOW)⚠ VM '%s' is not running.$(C_RESET)\n" "$(NAME)"; \
+	fi
 
 rm: ## Completely removes a VM and cleans its SSH alias (make rm NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make rm NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
 	@if ! VBoxManage showvminfo "$(NAME)" >/dev/null 2>&1; then \
-		printf "$(C_RED)Error: VM '$(NAME)' does not exist.$(C_RESET)\n"; exit 1; \
+		printf "$(C_RED)Error: VM '%s' does not exist.$(C_RESET)\n" "$(NAME)"; exit 1; \
 	fi
 	@if ! echo "$(NAME)" | grep -Eq "^($(TEMPLATE_NAME)|web-|inception-)"; then \
-		printf "$(C_RED)Error: VM '$(NAME)' is not a VM-Starter VM. Aborting for safety.$(C_RESET)\n"; exit 1; \
+		printf "$(C_RED)Error: VM '%s' is not a VM-Starter VM. Aborting for safety.$(C_RESET)\n" "$(NAME)"; exit 1; \
 	fi
-	@printf "$(C_YELLOW)▶ Deleting VM '$(NAME)'...$(C_RESET)\n"
+	@printf "$(C_YELLOW)▶ Deleting VM '%s'...$(C_RESET)\n" "$(NAME)"
 	@VBoxManage controlvm "$(NAME)" poweroff 2>/dev/null || true
 	@VBoxManage unregistervm "$(NAME)" --delete 2>/dev/null || true
-	@printf "$(C_YELLOW)▶ Cleaning SSH alias for '$(NAME)'...$(C_RESET)\n"
-	@awk -v host="Host $(NAME)" '$$0 == host { skip=1; next } skip && /^Host / { skip=0 } !skip { print }' ~/.ssh/config > ~/.ssh/config.tmp && mv ~/.ssh/config.tmp ~/.ssh/config 2>/dev/null || true
-	@printf "$(C_GREEN)✓ VM '$(NAME)' deleted.$(C_RESET)\n"
+	@printf "$(C_YELLOW)▶ Cleaning SSH alias for '%s'...$(C_RESET)\n" "$(NAME)"
+	@perl -0777 -pi -e 's/\nHost $(NAME).*?(?=\nHost |\z)//gs' ~/.ssh/config 2>/dev/null || true
+	@printf "$(C_GREEN)✓ VM '%s' deleted.$(C_RESET)\n" "$(NAME)"
 
 ssh: ## Connects to a VM via SSH (make ssh NAME=foo)
 	@if [ -z "$(NAME)" ]; then \
 		printf "$(C_RED)Error: missing NAME. Use: make ssh NAME=<vm-name>$(C_RESET)\n"; exit 1; \
 	fi
-	@# Try to detect the SSH port from VirtualBox port forwarding rules
 	@ssh_port=$$(VBoxManage showvminfo "$(NAME)" --machinereadable 2>/dev/null | grep "Forwarding" | grep "guestssh" | cut -d, -f4); \
 	if [ -n "$$ssh_port" ]; then \
-		printf "$(C_CYAN)▶ Connecting to '$(NAME)' on port $$ssh_port...$(C_RESET)\n"; \
+		printf "$(C_CYAN)▶ Connecting to '%s' on port $$ssh_port...$(C_RESET)\n" "$(NAME)"; \
 		ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $$ssh_port $(ADMIN_USER)@127.0.0.1; \
 	else \
-		printf "$(C_CYAN)▶ Connecting to project '$(NAME)' via SSH alias...$(C_RESET)\n"; \
+		printf "$(C_CYAN)▶ Connecting to project '%s' via SSH alias...$(C_RESET)\n" "$(NAME)"; \
 		ssh $(NAME); \
 	fi
 

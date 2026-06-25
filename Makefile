@@ -16,7 +16,7 @@ include mk/test.mk
 
 .PHONY: help
 help: ## Shows this help menu
-	@printf "$(C_BOLD)VM-Starter – Development VM Manager$(C_RESET)\n\n"
+	@printf "%bVM-Starter – Development VM Manager%b\n\n" "$(C_BOLD)" "$(C_RESET)"
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(C_CYAN)<target>$(C_RESET)\n"} \
 		/^[a-zA-Z_-]+:.*?##/ { printf "  $(C_CYAN)%-15s$(C_RESET) %s\n", $$1, $$2 } \
 		/^##@/ { printf "\n$(C_BOLD)%s$(C_RESET)\n", substr($$0, 5) } \
