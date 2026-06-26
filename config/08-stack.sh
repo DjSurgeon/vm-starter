@@ -45,6 +45,11 @@ export INCEPTION_MARIADB_VERSION="10.11"
 export INCEPTION_NGINX_VERSION="1.24"
 
 # -----------------------------------------------------------------------------
+# STACK: C-Pure (MODE_CPURE) – 42 Cursus (Piscine & Common Core)
+# -----------------------------------------------------------------------------
+export CPURE_PACKAGES="build-essential gcc clang gdb lldb valgrind git python3-setuptools pipx vim"
+
+# -----------------------------------------------------------------------------
 # COMMON TOOLS – installed in the VM regardless of mode
 # -----------------------------------------------------------------------------
 export COMMON_TOOLS=(

@@ -30,13 +30,15 @@ PROJECT_NAME=$(echo "$UI_INPUT_RESULT" | tr -d '\r')
 # -----------------------------------------------------------------------------
 # 3. Project Type (ui_select)
 # -----------------------------------------------------------------------------
-TYPE_OPTIONS=("Web (Node.js, Docker, pnpm)" "Inception (42 Project Structure)")
+TYPE_OPTIONS=("Web (Node.js, Docker, pnpm)" "Inception (42 Project Structure)" "C-Pure (42 Cursus, gcc, valgrind)")
 ui_select "Select Project Type:" "${TYPE_OPTIONS[@]}"
 
 if [[ "$UI_SELECT_RESULT" -eq 0 ]]; then
     PROJECT_TYPE="web"
-else
+elif [[ "$UI_SELECT_RESULT" -eq 1 ]]; then
     PROJECT_TYPE="inception"
+else
+    PROJECT_TYPE="c-pure"
 fi
 
 # -----------------------------------------------------------------------------

@@ -39,3 +39,33 @@ load setup
     [ "$status" -ne 0 ]
     [[ "$output" == *"Validation Error: VM_RAM must be a strictly numeric value"* ]]
 }
+
+@test "Config: El stack 'c-pure' debe asignar exactamente 1024MB de RAM y 1 CPU" {
+    export PROJECT_ROOT
+    source "${PROJECT_ROOT}/config/04-clones.sh"
+    source "${PROJECT_ROOT}/config/99-functions.sh"
+    
+    # Validamos que las variables existan y tengan el valor estricto esperado
+    [ "$CPURE_CLONE_RAM_MB" -eq 1024 ]
+    [ "$CPURE_CLONE_CPU" -eq 1 ]
+    
+    # Validamos que son estrictamente numéricas usando la librería base
+    run validate_numeric "CPURE_CLONE_RAM_MB" "$CPURE_CLONE_RAM_MB"
+    [ "$status" -eq 0 ]
+    
+    run validate_numeric "CPURE_CLONE_CPU" "$CPURE_CLONE_CPU"
+    [ "$status" -eq 0 ]
+}
+
+@test "Config: El stack 'c-pure' debe incluir gcc, clang, gdb, valgrind, vim y pipx" {
+    export PROJECT_ROOT
+    source "${PROJECT_ROOT}/config/08-stack.sh"
+    
+    # Verificamos la presencia de herramientas críticas como subcadenas
+    [[ "$CPURE_PACKAGES" == *"gcc"* ]]
+    [[ "$CPURE_PACKAGES" == *"clang"* ]]
+    [[ "$CPURE_PACKAGES" == *"gdb"* ]]
+    [[ "$CPURE_PACKAGES" == *"valgrind"* ]]
+    [[ "$CPURE_PACKAGES" == *"pipx"* ]]
+    [[ "$CPURE_PACKAGES" == *"vim"* ]]
+}

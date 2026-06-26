@@ -83,14 +83,14 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         REMOTE_INCEPTION_DOMAIN="$3"
 
         echo "===================================================="
-        echo "  Aprovisionamiento Limpio de Inception para: ${REMOTE_ADMIN_USER}"
+        echo "  Clean Inception Provisioning for: ${REMOTE_ADMIN_USER}"
         echo "===================================================="
 
         # 1. Configuración Real del archivo /etc/hosts
         echo "Fixing /etc/hosts inside the VM..."
         if ! grep -q "${REMOTE_INCEPTION_DOMAIN}" /etc/hosts; then
             echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S sh -c "echo '127.0.0.1    ${REMOTE_INCEPTION_DOMAIN}' >> /etc/hosts" > /dev/null
-            echo "[OK] Dominio ${REMOTE_INCEPTION_DOMAIN} enlazado a 127.0.0.1"
+            echo "[OK] Domain ${REMOTE_INCEPTION_DOMAIN} successfully bound to 127.0.0.1"
         fi
 
         # 2. Estructura de Persistencia en el Host
@@ -101,14 +101,53 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         # Asegurar permisos
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S chown -R "${REMOTE_ADMIN_USER}:${REMOTE_ADMIN_USER}" "/home/${REMOTE_ADMIN_USER}/data" 2>/dev/null || true
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S chmod -R 755 "/home/${REMOTE_ADMIN_USER}/data"
-        echo "[OK] Carpetas de datos creadas en /home/${REMOTE_ADMIN_USER}/data"
+        echo "[OK] Data directories successfully created at /home/${REMOTE_ADMIN_USER}/data"
 
-        # 3. Limpieza de entorno
+        # 3. Environment cleanup
         rm -rf "/home/${REMOTE_ADMIN_USER}/inception"
 
         echo "===================================================="
-        echo "  ¡VM lista! Entra, clona tu repo en tu HOME y ejecuta make"
+        echo "  VM ready! SSH into the machine, clone your repo in your HOME, and run make"
         echo "===================================================="
+EOF
+
+elif [ "$PROJECT_TYPE" = "c-pure" ]; then
+    log "Provisioning C-Pure environment for 42 Cursus..."
+    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "$CPURE_PACKAGES" <<'EOF'
+        REMOTE_ADMIN_USER="$1"
+        REMOTE_ADMIN_PASSWORD="$2"
+        REMOTE_CPURE_PACKAGES="$3"
+
+        echo "===================================================="
+        echo "  C-Pure Provisioning (42 Cursus)"
+        echo "===================================================="
+
+        # 1. Install base C tools
+        echo "📦 Installing compilers and core tools..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y $REMOTE_CPURE_PACKAGES
+
+        # 2. Install Norminette via pipx
+        echo "📏 Installing official 42 Norminette..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" pipx install norminette
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" pipx ensurepath
+
+        # 3. Configure .bashrc aliases and environment variables
+        echo "🔧 Configuring strict environment in .bashrc..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" bash -c 'cat << "EOF_BASHRC" >> ~/.bashrc
+
+# ==========================================
+# 42 CURSUS - C-PURE ALIASES & CONFIG
+# ==========================================
+export CC=cc
+export CFLAGS="-Wall -Wextra -Werror -g3"
+
+alias gcc42="gcc -Wall -Wextra -Werror"
+alias clang42="clang -Wall -Wextra -Werror"
+alias vcheck="valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes"
+EOF_BASHRC'
+
+        echo "✅ C-Pure environment successfully configured."
 EOF
 fi
 

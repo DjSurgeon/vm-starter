@@ -24,8 +24,8 @@ fi
 
 validate_project_name "$PROJECT_NAME"
 
-if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" ]]; then
-    error "Invalid project type: $PROJECT_TYPE. Must be 'web' or 'inception'."
+if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" && "$PROJECT_TYPE" != "c-pure" ]]; then
+    error "Invalid project type: $PROJECT_TYPE. Must be 'web', 'inception', or 'c-pure'."
 fi
 
 # Ensure base template exists
@@ -40,6 +40,10 @@ if [ "$PROJECT_TYPE" = "web" ]; then
     PREFIX="$WEB_PREFIX"
     RAM="$WEB_CLONE_RAM_MB"
     CPU="$WEB_CLONE_CPU"
+elif [ "$PROJECT_TYPE" = "c-pure" ]; then
+    PREFIX="$CPURE_PREFIX"
+    RAM="$CPURE_CLONE_RAM_MB"
+    CPU="$CPURE_CLONE_CPU"
 else
     PREFIX="$INCEPTION_PREFIX"
     RAM="$INCEPTION_CLONE_RAM_MB"
