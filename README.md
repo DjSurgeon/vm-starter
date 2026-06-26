@@ -23,10 +23,11 @@ As a student at **42 School**, I realized that setting up development environmen
 
 - **Fully automated** – From ISO download to template creation using Cloud-Init (zero manual steps).
 - **Modular configuration** – Settings (RAM, CPU, packages) are split into small, documented scripts.
-- **Three built‑in project types**:
+- **Four built‑in project types**:
   - `web` – Node.js 20 + pnpm + Docker (modern web development).
   - `inception` – Skeleton for the 42 Inception project.
   - `c-pure` – Ultra lightweight C environment for 42 Cursus (Piscine, Libft) with Norminette and strict compilation.
+  - `cpp-98` – C++98 strict environment with Google Style Clang-Format auto-injection.
 - **Smart SSH port allocation** – Automatically assigns unique host ports (4222, 4223, …) preventing collisions.
 - **VS Code Remote SSH ready** – Pre‑configured settings to prevent connection drops.
 

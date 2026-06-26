@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-06-26
 
 ### Added
+- **CPP-98 Stack:** New environment optimized for 42 Cursus C++ Modules (2GB RAM). Includes `g++` and auto-injects `clang-format` configured to Google Style, enabling high-quality code governance via the custom `cformat` alias.
 - **C-Pure Stack:** New hyper-optimized VM environment (1 CPU, 1GB RAM) designed for the 42 Cursus (Piscine, Libft). Includes GCC, Clang, GDB, Valgrind, Vim, and official Norminette injected via `pipx`.
 - **English Technical Standardization:** Full refactoring of all provisioning scripts and console logs to use Technical English, improving international readability and professional portfolio quality.
 

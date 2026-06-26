@@ -149,6 +149,45 @@ EOF_BASHRC'
 
         echo "✅ C-Pure environment successfully configured."
 EOF
+
+elif [ "$PROJECT_TYPE" = "cpp-98" ]; then
+    log "Provisioning C++98 strict environment for 42 Cursus..."
+    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "$CPP98_PACKAGES" <<'EOF'
+        REMOTE_ADMIN_USER="$1"
+        REMOTE_ADMIN_PASSWORD="$2"
+        REMOTE_CPP98_PACKAGES="$3"
+
+        echo "===================================================="
+        echo "  C++98 Provisioning (42 Cursus)"
+        echo "===================================================="
+
+        # 1. Install base C++ tools
+        echo "📦 Installing C++ compilers and core tools..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y $REMOTE_CPP98_PACKAGES
+
+        # 2. Configure Clang-Format (Google Style)
+        echo "🎨 Configuring Clang-Format (Google Style)..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" bash -c 'clang-format -style=Google -dump-config > "$HOME/.clang-format"'
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" sed -i 's/IndentWidth: 2/IndentWidth: 4/g' "$HOME/.clang-format"
+
+        # 3. Configure .bashrc aliases and strict compilation flags
+        echo "🔧 Configuring strict C++98 environment in .bashrc..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" bash -c 'cat << "EOF_BASHRC" >> ~/.bashrc
+
+# ==========================================
+# 42 CURSUS - CPP-98 ALIASES & CONFIG
+# ==========================================
+alias c++42="g++ -Wall -Wextra -Werror -std=c++98"
+alias clang++42="clang++ -Wall -Wextra -Werror -std=c++98"
+alias cformat="clang-format -i *.cpp *.hpp 2>/dev/null || clang-format -i *.cpp *.h 2>/dev/null"
+
+export CXX=g++
+export CXXFLAGS="-Wall -Wextra -Werror -std=c++98 -g3"
+EOF_BASHRC'
+
+        echo "✅ C++98 environment successfully configured."
+EOF
 fi
 
 success "Provisioning for '$VM_NAME' complete."

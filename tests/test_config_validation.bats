@@ -69,3 +69,29 @@ load setup
     [[ "$CPURE_PACKAGES" == *"pipx"* ]]
     [[ "$CPURE_PACKAGES" == *"vim"* ]]
 }
+
+@test "Config: El stack 'cpp-98' debe asignar exactamente 2048MB de RAM y 1 CPU" {
+    export PROJECT_ROOT
+    source "${PROJECT_ROOT}/config/04-clones.sh"
+    source "${PROJECT_ROOT}/config/99-functions.sh"
+    
+    # Validamos que las variables existan y tengan el valor estricto esperado
+    [ "$CPP98_CLONE_RAM_MB" -eq 2048 ]
+    [ "$CPP98_CLONE_CPU" -eq 1 ]
+    
+    # Validamos que son estrictamente numéricas usando la librería base
+    run validate_numeric "CPP98_CLONE_RAM_MB" "$CPP98_CLONE_RAM_MB"
+    [ "$status" -eq 0 ]
+    
+    run validate_numeric "CPP98_CLONE_CPU" "$CPP98_CLONE_CPU"
+    [ "$status" -eq 0 ]
+}
+
+@test "Config: El stack 'cpp-98' debe incluir g++ y clang-format" {
+    export PROJECT_ROOT
+    source "${PROJECT_ROOT}/config/08-stack.sh"
+    
+    # Verificamos la presencia de herramientas críticas como subcadenas
+    [[ "$CPP98_PACKAGES" == *"g++"* ]]
+    [[ "$CPP98_PACKAGES" == *"clang-format"* ]]
+}

@@ -50,6 +50,11 @@ export INCEPTION_NGINX_VERSION="1.24"
 export CPURE_PACKAGES="build-essential gcc clang gdb lldb valgrind git python3-setuptools pipx vim"
 
 # -----------------------------------------------------------------------------
+# STACK: C++98 (MODE_CPP98) – 42 Cursus (C++ Modules)
+# -----------------------------------------------------------------------------
+export CPP98_PACKAGES="build-essential g++ clang clang-format gdb valgrind git vim"
+
+# -----------------------------------------------------------------------------
 # COMMON TOOLS – installed in the VM regardless of mode
 # -----------------------------------------------------------------------------
 export COMMON_TOOLS=(
