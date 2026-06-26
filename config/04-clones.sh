@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 export MODE_DEV="dev"               # Modern web development (Node, containers, heavy)
 export MODE_INCEPTION="inception"    # 42 Inception project (lightweight, specific structure)
+export MODE_CPURE="c-pure"           # 42 Cursus base projects (ultra lightweight C environment)
 
 # Default mode when creating a new clone (can be overridden by --type flag)
 export DEFAULT_CLONE_MODE="${MODE_DEV}"
@@ -32,11 +33,20 @@ export INCEPTION_CLONE_CPU="2"           # Number of virtual CPUs
 export INCEPTION_CLONE_DISK_MB="30720"   # Disk size in MB (30 GB) – for Docker volumes and images
 
 # -----------------------------------------------------------------------------
+# C-PURE MODE – 42 Cursus base projects
+# Minimal footprint specifically tuned for compiling C with Norminette
+# -----------------------------------------------------------------------------
+export CPURE_CLONE_RAM_MB="1024"        # RAM in MB (1 GB) – Super lightweight
+export CPURE_CLONE_CPU="1"               # Number of virtual CPUs
+export CPURE_CLONE_DISK_MB="10240"       # Disk size in MB (10 GB)
+
+# -----------------------------------------------------------------------------
 # NAMING PREFIXES
 # Used to generate VM names: e.g., "web-ecommerce", "inception-42", "mobile-app", "desktop-tool"
 # -----------------------------------------------------------------------------
 export WEB_PREFIX="web"                # Prefix for web projects
 export INCEPTION_PREFIX="inception"    # Prefix for 42 Inception projects
+export CPURE_PREFIX="cpure"            # Prefix for 42 C-Pure projects
 export MOBILE_PREFIX="mobile"          # Prefix for mobile projects (Android/iOS) – future use
 export DESKTOP_PREFIX="desktop"        # Prefix for desktop/Electron/Rust projects – future use
 
