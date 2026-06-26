@@ -38,6 +38,7 @@ The wizard will prompt you for:
 2. **Project type**:
    - `web`: Installs Node.js, Docker, and modern web development tools.
    - `inception`: Leaves a folder skeleton (`srcs/nginx`, etc.) ready for the 42 Inception project.
+   - `c-pure`: Installs a strict, ultra-lightweight C environment (`gcc`, `clang`, `valgrind`, official `norminette`) specifically tuned for the 42 Cursus (Piscine, Libft). It pre-configures `.bashrc` aliases like `gcc42` and sets `CC=cc`.
 
 > ⏳ **Note**: The first time you run this on a new computer, it will have to download the Ubuntu ISO (about 2GB) and create the base template. This can take about 10-15 minutes. Be patient!
 

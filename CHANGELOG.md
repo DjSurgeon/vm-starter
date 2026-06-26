@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-26
+
+### Added
+- **C-Pure Stack:** New hyper-optimized VM environment (1 CPU, 1GB RAM) designed for the 42 Cursus (Piscine, Libft). Includes GCC, Clang, GDB, Valgrind, Vim, and official Norminette injected via `pipx`.
+- **English Technical Standardization:** Full refactoring of all provisioning scripts and console logs to use Technical English, improving international readability and professional portfolio quality.
+
 ## [1.0.0] - 2026-06-25
 
 ### Added

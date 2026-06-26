@@ -42,6 +42,9 @@ In `config/06-network.sh`, a base port (e.g., `4222`) is defined. The clone scri
 ## 5. Adding New Project Types
 
 To add a new environment type (e.g., `python-data`):
-1. Add the type logic to `config/08-stack.sh`.
-2. Update the `wizard.sh` interface options.
-3. During cloning (`create-clone.sh`), use SSH to send the specific setup script to the new VM.
+1. Define resource limits (RAM, CPU, disk) and naming prefixes in `config/04-clones.sh`.
+2. Add the software dependency arrays or strings in `config/08-stack.sh`.
+3. Update the `wizard.sh` UI options and handle the `PROJECT_TYPE` assignment.
+4. Add the validation and variable extraction logic into `scripts/clone.sh`.
+5. Inject the environment-specific setup logic via SSH in `scripts/provision-project.sh`.
+6. Enforce configuration immutability by adding integration tests in `tests/test_config_validation.bats`.
