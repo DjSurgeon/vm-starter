@@ -62,7 +62,7 @@ rm: ## Completely removes a VM and cleans its SSH alias (make rm NAME=foo)
 	@if ! VBoxManage showvminfo "$(NAME)" >/dev/null 2>&1; then \
 		printf "%bError: VM '%s' does not exist.%b\n" "$(C_RED)" "$(NAME)" "$(C_RESET)"; exit 1; \
 	fi
-	@if ! echo "$(NAME)" | grep -Eq "^($(TEMPLATE_NAME)|web-|inception-)"; then \
+	@if ! echo "$(NAME)" | grep -Eq "^($(TEMPLATE_NAME)|web-|inception-|cpure-|cpp-)"; then \
 		printf "%bError: VM '%s' is not a VM-Starter VM. Aborting for safety.%b\n" "$(C_RED)" "$(NAME)" "$(C_RESET)"; exit 1; \
 	fi
 	@printf "%b▶ Deleting VM '%s'...%b\n" "$(C_YELLOW)" "$(NAME)" "$(C_RESET)"
@@ -110,4 +110,4 @@ status: ## Shows detailed status of the template and projects
 		printf "  (no projects found)\n"; \
 	fi
 	@printf "%bSSH aliases:%b\n" "$(C_BOLD)" "$(C_RESET)"
-	@grep -E "^Host " ~/.ssh/config 2>/dev/null | grep -E "(web|inception)-" | sed 's/Host /  /' || printf "  (none)\n"
+	@grep -E "^Host " ~/.ssh/config 2>/dev/null | grep -E "(web|inception|cpure|cpp)-" | sed 's/Host /  /' || printf "  (none)\n"

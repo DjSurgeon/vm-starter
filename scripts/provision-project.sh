@@ -66,6 +66,9 @@ if [ "$PROJECT_TYPE" = "web" ]; then
         REMOTE_ADMIN_PASSWORD="$1"
         REMOTE_NODE_VERSION="$2"
         REMOTE_PNPM_VERSION="$3"
+        set -e
+        echo "⏳ Waiting for apt locks to clear..."
+        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
         curl -fsSL "https://deb.nodesource.com/setup_${REMOTE_NODE_VERSION}.x" -o nodesource_setup.sh
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -E bash nodesource_setup.sh >/dev/null 2>&1
@@ -118,9 +121,14 @@ elif [ "$PROJECT_TYPE" = "c-pure" ]; then
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_CPURE_PACKAGES="$3"
 
+        set -e
+
         echo "===================================================="
         echo "  C-Pure Provisioning (42 Cursus)"
         echo "===================================================="
+
+        echo "⏳ Waiting for apt locks to clear..."
+        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
 
         # 1. Install base C tools
         echo "📦 Installing compilers and core tools..."
@@ -157,9 +165,14 @@ elif [ "$PROJECT_TYPE" = "cpp-98" ]; then
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_CPP98_PACKAGES="$3"
 
+        set -e
+
         echo "===================================================="
         echo "  C++98 Provisioning (42 Cursus)"
         echo "===================================================="
+
+        echo "⏳ Waiting for apt locks to clear..."
+        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
 
         # 1. Install base C++ tools
         echo "📦 Installing C++ compilers and core tools..."
