@@ -116,7 +116,7 @@ EOF
 
 elif [ "$PROJECT_TYPE" = "c-pure" ]; then
     log "Provisioning C-Pure environment for 42 Cursus..."
-    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "$CPURE_PACKAGES" <<'EOF'
+    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "\"$CPURE_PACKAGES\"" <<'EOF'
         REMOTE_ADMIN_USER="$1"
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_CPURE_PACKAGES="$3"
@@ -160,7 +160,7 @@ EOF
 
 elif [ "$PROJECT_TYPE" = "cpp-98" ]; then
     log "Provisioning C++98 strict environment for 42 Cursus..."
-    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "$CPP98_PACKAGES" <<'EOF'
+    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "\"$CPP98_PACKAGES\"" <<'EOF'
         REMOTE_ADMIN_USER="$1"
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_CPP98_PACKAGES="$3"
