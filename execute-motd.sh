@@ -1,9 +1,0 @@
-#!/bin/bash
-CORES=$(nproc)
-RAM=$(free -m | awk '/^Mem:/ {print $2}')
-DISK=$(df -h / | awk 'NR==2 {print $4}')
-HOST=$(hostname)
-
-echo \"\"
-printf \"/*   %-47s+#+  +:+       +#+        */\n\" \"Hostname: $HOST\"
-printf \"/*   %-45s+#+#+#+#+#+   +#+           */\n\" \"Resources: $CORES Cores | ${RAM}MB RAM | $DISK Free\"
