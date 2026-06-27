@@ -34,7 +34,7 @@ ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_PASSWORD" "$A
     REMOTE_ADMIN_USER="$2"
     echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S chmod -x /etc/update-motd.d/10-help-text /etc/update-motd.d/50-motd-news /etc/update-motd.d/50-ubuntu-adv 2>/dev/null || true
 
-    echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S sh -c "cat << EOF_MOTD > /etc/update-motd.d/99-devpod
+    echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S sh -c "cat << 'EOF_MOTD' > /etc/update-motd.d/99-devpod
 #!/bin/bash
 CORES=\$(nproc)
 RAM=\$(free -m | awk '/^Mem:/ {print \$2}')
