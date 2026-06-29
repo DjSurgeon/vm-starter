@@ -2,6 +2,8 @@
 # VM-Starter Makefile – Modular Entry Point
 # =============================================================================
 
+export PATH := $(shell pwd)/.bin:$(PATH)
+
 # 1. Include modular components
 include mk/config.mk
 include mk/vm-ops.mk
