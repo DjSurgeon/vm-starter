@@ -114,6 +114,56 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         echo "===================================================="
 EOF
 
+elif [ "$PROJECT_TYPE" = "inception-gui" ]; then
+    log "Running clean provisioning for Inception GUI..."
+    ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "$INCEPTION_DOMAIN" <<'EOF'
+        REMOTE_ADMIN_USER="$1"
+        REMOTE_ADMIN_PASSWORD="$2"
+        REMOTE_INCEPTION_DOMAIN="$3"
+
+        echo "===================================================="
+        echo "  Inception GUI Provisioning for: ${REMOTE_ADMIN_USER}"
+        echo "===================================================="
+
+        # 1. Host mapping
+        echo "Fixing /etc/hosts inside the VM..."
+        if ! grep -q "${REMOTE_INCEPTION_DOMAIN}" /etc/hosts; then
+            echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S sh -c "echo '127.0.0.1    ${REMOTE_INCEPTION_DOMAIN}' >> /etc/hosts" > /dev/null
+            echo "[OK] Domain ${REMOTE_INCEPTION_DOMAIN} successfully bound to 127.0.0.1"
+        fi
+
+        # 2. Environment cleanup (No data directories created to keep it clean)
+        rm -rf "/home/${REMOTE_ADMIN_USER}/inception"
+
+        # 3. GUI Installation
+        echo "⏳ Waiting for apt locks to clear..."
+        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        
+        echo "📦 Installing Minimal XFCE Environment and Epiphany Browser..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xfce4 xfce4-session xinit xserver-xorg xserver-xorg-legacy epiphany-browser >/dev/null
+
+        echo "🔧 Configuring X11 Permissions and Spanish Keyboard..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S bash -c 'cat << "EOF_X11" > /etc/X11/Xwrapper.config
+allowed_users=anybody
+needs_root_rights=yes
+EOF_X11'
+
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S mkdir -p /etc/X11/xorg.conf.d
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S bash -c 'cat << "EOF_KBD" > /etc/X11/xorg.conf.d/00-keyboard.conf
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "es"
+EndSection
+EOF_KBD'
+
+        echo "===================================================="
+        echo "  VM ready! SSH into the machine, clone your repo, and run 'startx' to launch GUI"
+        echo "===================================================="
+EOF
+
+
 elif [ "$PROJECT_TYPE" = "c-pure" ]; then
     log "Provisioning C-Pure environment for 42 Cursus..."
     ssh -q -o StrictHostKeyChecking=no "$VM_NAME" "bash -s" -- "$ADMIN_USER" "$ADMIN_PASSWORD" "\"$CPURE_PACKAGES\"" <<'EOF'

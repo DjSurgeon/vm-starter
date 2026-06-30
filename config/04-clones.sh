@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 export MODE_DEV="dev"               # Modern web development (Node, containers, heavy)
 export MODE_INCEPTION="inception"    # 42 Inception project (lightweight, specific structure)
+export MODE_INCEPTION_GUI="inception-gui" # 42 Inception project with XFCE GUI
 export MODE_CPURE="c-pure"           # 42 Cursus base projects (ultra lightweight C environment)
 export MODE_CPP98="cpp-98"           # 42 Cursus C++ modules (C++98 strict environment)
 
@@ -34,6 +35,13 @@ export INCEPTION_CLONE_CPU="2"           # Number of virtual CPUs
 export INCEPTION_CLONE_DISK_MB="30720"   # Disk size in MB (30 GB) – for Docker volumes and images
 
 # -----------------------------------------------------------------------------
+# INCEPTION GUI MODE – 42 project with Minimal Graphical Interface
+# -----------------------------------------------------------------------------
+export INCEPTION_GUI_CLONE_RAM_MB="4096"
+export INCEPTION_GUI_CLONE_CPU="2"
+export INCEPTION_GUI_CLONE_DISK_MB="30720"
+
+# -----------------------------------------------------------------------------
 # C-PURE MODE – 42 Cursus base projects
 # Minimal footprint specifically tuned for compiling C with Norminette
 # -----------------------------------------------------------------------------
@@ -54,6 +62,7 @@ export CPP98_CLONE_DISK_MB="10240"       # Disk size in MB (10 GB)
 # -----------------------------------------------------------------------------
 export WEB_PREFIX="web"                # Prefix for web projects
 export INCEPTION_PREFIX="inception"    # Prefix for 42 Inception projects
+export INCEPTION_GUI_PREFIX="inception-gui" # Prefix for 42 Inception GUI projects
 export CPURE_PREFIX="cpure"            # Prefix for 42 C-Pure projects
 export CPP98_PREFIX="cpp"              # Prefix for 42 CPP-98 projects
 

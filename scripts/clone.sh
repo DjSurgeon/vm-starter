@@ -24,8 +24,8 @@ fi
 
 validate_project_name "$PROJECT_NAME"
 
-if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" && "$PROJECT_TYPE" != "c-pure" && "$PROJECT_TYPE" != "cpp-98" ]]; then
-    error "Invalid project type: $PROJECT_TYPE. Must be 'web', 'inception', 'c-pure', or 'cpp-98'."
+if [[ "$PROJECT_TYPE" != "web" && "$PROJECT_TYPE" != "inception" && "$PROJECT_TYPE" != "inception-gui" && "$PROJECT_TYPE" != "c-pure" && "$PROJECT_TYPE" != "cpp-98" ]]; then
+    error "Invalid project type: $PROJECT_TYPE. Must be 'web', 'inception', 'inception-gui', 'c-pure', or 'cpp-98'."
 fi
 
 # Ensure base template exists
@@ -48,6 +48,10 @@ elif [ "$PROJECT_TYPE" = "cpp-98" ]; then
     PREFIX="$CPP98_PREFIX"
     RAM="$CPP98_CLONE_RAM_MB"
     CPU="$CPP98_CLONE_CPU"
+elif [ "$PROJECT_TYPE" = "inception-gui" ]; then
+    PREFIX="$INCEPTION_GUI_PREFIX"
+    RAM="$INCEPTION_GUI_CLONE_RAM_MB"
+    CPU="$INCEPTION_GUI_CLONE_CPU"
 else
     PREFIX="$INCEPTION_PREFIX"
     RAM="$INCEPTION_CLONE_RAM_MB"
