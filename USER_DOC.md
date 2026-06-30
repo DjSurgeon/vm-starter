@@ -38,6 +38,7 @@ The wizard will prompt you for:
 2. **Project type**:
    - `web`: Installs Node.js, Docker, and modern web development tools.
    - `inception`: Leaves a folder skeleton (`srcs/nginx`, etc.) ready for the 42 Inception project.
+   - `inception-gui`: Installs the Inception folder skeleton and adds a minimal, preconfigured XFCE graphical environment with the Epiphany browser. Ideal for cluster evaluations where X11 Forwarding is blocked. To use it, connect to the machine via SSH or VirtualBox console and run `startx`.
    - `c-pure`: Installs a strict, ultra-lightweight C environment (`gcc`, `clang`, `valgrind`, official `norminette`) specifically tuned for the 42 Cursus (Piscine, Libft). It pre-configures `.bashrc` aliases like `gcc42` and sets `CC=cc`.
    - `cpp-98`: Installs a C++ environment specifically tuned for the 42 Cursus C++ Modules. Features `g++`, strict compilation aliases (`c++42`), and auto-injects `clang-format` (Google Style with 4 spaces) accessible via the `cformat` command.
 

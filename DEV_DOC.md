@@ -48,3 +48,5 @@ To add a new environment type (e.g., `python-data`):
 4. Add the validation and variable extraction logic into `scripts/clone.sh`.
 5. Inject the environment-specific setup logic via SSH in `scripts/provision-project.sh`.
 6. Enforce configuration immutability by adding integration tests in `tests/test_config_validation.bats`.
+
+> **Note on Complex Environments (e.g., `inception-gui`)**: The provisioning engine supports completely unattended installation of Graphical User Interfaces (XFCE, X11 configurations) without user interaction by setting `DEBIAN_FRONTEND=noninteractive` and injecting configuration blocks directly into system paths via SSH.

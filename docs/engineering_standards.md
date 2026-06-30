@@ -321,3 +321,39 @@ User ${ssh_user}
 ```
 
 **Why we do this**: It keeps our linter active to catch real typos in the future, while naturally forcing us to use more specific and descriptive local variable names (e.g., `ssh_user` instead of a generic `admin_user`).
+
+---
+
+## 3. System Architecture & Provisioning Standards
+
+### Avoid Snap Packages in Headless / Virtualized Environments
+
+**Severity**: High (System Instability / Networking Bugs)
+**Context**: Modern Ubuntu heavily relies on Snap packages (e.g., Firefox, Chromium). However, Snap containers create complex namespace isolation barriers.
+
+#### ❌ The Problem
+When running web browsers or GUI applications from a headless VM using `startx` or X11 forwarding, Snap packages often fail to find the display, or their isolated network stack fails to resolve custom `/etc/hosts` entries (like `127.0.0.1 inception.42.fr`), leading to broken CSS rendering during evaluations.
+
+#### ✅ The Solution (Enterprise Standard)
+Always install native `.deb` packages from static repositories. For example, instead of using the default Snap Firefox, we install `epiphany-browser` natively via `apt-get`.
+```bash
+# GOOD: Native package with direct access to /etc/hosts and the X11 socket
+sudo apt-get install -y epiphany-browser
+```
+
+---
+
+### Use `--no-install-recommends` for all GUI/Desktop packages
+
+**Severity**: Medium (Storage Bloat)
+**Context**: Installing desktop environments like `xfce4` automatically pulls in gigabytes of recommended software (office suites, media players, games).
+
+#### ❌ The Problem
+Our users (42 students) operate under strict storage quotas (5GB - 30GB). A simple GUI installation can blow up the VM disk size unnecessarily.
+
+#### ✅ The Solution (Enterprise Standard)
+When provisioning UI packages, always append the `--no-install-recommends` flag to install exclusively the core dependencies required to run the software.
+```bash
+# GOOD: Installs only the minimal desktop, saving gigabytes of disk space
+sudo apt-get install -y --no-install-recommends xfce4 xfce4-session
+```
