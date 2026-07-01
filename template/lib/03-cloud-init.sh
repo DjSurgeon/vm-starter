@@ -12,8 +12,10 @@ generate_cloud_init() {
     export SEED_ISO="${ISO_DIR}/seed-${TEMPLATE_NAME}.iso"
     log "Building seed ISO with ${ISO_CMD}..."
     
-    ${ISO_CMD} -output "${SEED_ISO}" -volid cidata -joliet -rock -r \
-        "${CLOUD_INIT_DIR}/user-data" "${CLOUD_INIT_DIR}/meta-data" >/dev/null 2>&1
+    if ! ${ISO_CMD} -output "${SEED_ISO}" -volid cidata -joliet -rock -r \
+        "${CLOUD_INIT_DIR}/user-data" "${CLOUD_INIT_DIR}/meta-data"; then
+        error "Failed to build seed ISO with ${ISO_CMD}. Check the output above for details."
+    fi
 }
 
 generate_ubuntu_autoinstall() {
