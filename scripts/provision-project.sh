@@ -67,13 +67,13 @@ if [ "$PROJECT_TYPE" = "web" ]; then
         REMOTE_NODE_VERSION="$2"
         REMOTE_PNPM_VERSION="$3"
         set -e
-        echo "⏳ Waiting for apt locks to clear..."
-        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        echo "⏳ Waiting for cloud-init to finish background setup..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S cloud-init status --wait >/dev/null 2>&1 || true
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
         curl -fsSL "https://deb.nodesource.com/setup_${REMOTE_NODE_VERSION}.x" -o nodesource_setup.sh
-        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -E bash nodesource_setup.sh >/dev/null 2>&1
-        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs >/dev/null 2>&1
-        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S npm install -g "pnpm@${REMOTE_PNPM_VERSION}" >/dev/null 2>&1
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -E bash nodesource_setup.sh
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S npm install -g "pnpm@${REMOTE_PNPM_VERSION}"
         rm -f nodesource_setup.sh
         mkdir -p ~/projects
 EOF
@@ -84,6 +84,8 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         REMOTE_ADMIN_USER="$1"
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_INCEPTION_DOMAIN="$3"
+
+        set -e
 
         echo "===================================================="
         echo "  Clean Inception Provisioning for: ${REMOTE_ADMIN_USER}"
@@ -121,6 +123,8 @@ elif [ "$PROJECT_TYPE" = "inception-gui" ]; then
         REMOTE_ADMIN_PASSWORD="$2"
         REMOTE_INCEPTION_DOMAIN="$3"
 
+        set -e
+
         echo "===================================================="
         echo "  Inception GUI Provisioning for: ${REMOTE_ADMIN_USER}"
         echo "===================================================="
@@ -136,12 +140,12 @@ elif [ "$PROJECT_TYPE" = "inception-gui" ]; then
         rm -rf "/home/${REMOTE_ADMIN_USER}/inception"
 
         # 3. GUI Installation
-        echo "⏳ Waiting for apt locks to clear..."
-        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        echo "⏳ Waiting for cloud-init to finish background setup..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S cloud-init status --wait >/dev/null 2>&1 || true
         
         echo "📦 Installing Minimal XFCE Environment and Epiphany Browser..."
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
-        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xfce4 xfce4-session xinit xserver-xorg xserver-xorg-legacy epiphany-browser >/dev/null
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xfce4 xfce4-session xinit xserver-xorg xserver-xorg-legacy epiphany-browser
 
         echo "🔧 Configuring X11 Permissions and Spanish Keyboard..."
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S bash -c 'cat << "EOF_X11" > /etc/X11/Xwrapper.config
@@ -177,8 +181,8 @@ elif [ "$PROJECT_TYPE" = "c-pure" ]; then
         echo "  C-Pure Provisioning (42 Cursus)"
         echo "===================================================="
 
-        echo "⏳ Waiting for apt locks to clear..."
-        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        echo "⏳ Waiting for cloud-init to finish background setup..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S cloud-init status --wait >/dev/null 2>&1 || true
 
         # 1. Install base C tools
         echo "📦 Installing compilers and core tools..."
@@ -221,8 +225,8 @@ elif [ "$PROJECT_TYPE" = "cpp-98" ]; then
         echo "  C++98 Provisioning (42 Cursus)"
         echo "===================================================="
 
-        echo "⏳ Waiting for apt locks to clear..."
-        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        echo "⏳ Waiting for cloud-init to finish background setup..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S cloud-init status --wait >/dev/null 2>&1 || true
 
         # 1. Install base C++ tools
         echo "📦 Installing C++ compilers and core tools..."
